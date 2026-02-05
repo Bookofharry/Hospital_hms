@@ -27,7 +27,7 @@ export default function LandingPricing() {
         <div className="pricing-card pricing-card-highlight">
           <div className="pricing-badge">Most Popular</div>
           <h3>Operations</h3>
-          <p className="pricing-price">₦1.2M / mo</p>
+          <p className="pricing-price">₦379,000 / mo</p>
           <p className="pricing-note">For multi-department hospital operations.</p>
           <ul className="pricing-list">
             <li>Unlimited work orders</li>
