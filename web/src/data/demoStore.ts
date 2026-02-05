@@ -13,24 +13,97 @@ import {
     demoAssetHealth
 } from './demo';
 
+type AssetDemo = (typeof demoAssets)[number] & {
+    purchaseDate?: string;
+};
+
+type WorkOrderDemo = {
+    id: string;
+    title: string;
+    description: string;
+    priority: string;
+    status: string;
+    createdAt: string;
+    asset?: { id: string; name: string; location: string };
+    assignedTo?: { id: string; name: string };
+    createdBy: { name: string };
+    attachments?: { id: string; url: string; fileName: string; fileType: string; createdAt: string }[];
+    timeLogs?: { id: string; minutes: number; description: string; user: { name: string }; createdAt: string }[];
+};
+
+type UserDemo = (typeof demoUsers)[number] & {
+    status?: string;
+};
+
+type InventoryDemo = {
+    id: string;
+    name: string;
+    sku: string;
+    description?: string;
+    quantity: number;
+    minimumStock: number;
+    unit: string;
+    supplier?: { name: string };
+};
+
+type SupplierDemo = {
+    id: string;
+    name: string;
+    email?: string;
+    phone?: string;
+    address?: string;
+};
+
+type PreventiveDemo = (typeof demoPreventivePlans)[number];
+
+type OxygenDemo = {
+    id: string;
+    serialNumber: string;
+    status: 'FULL' | 'IN_USE' | 'EMPTY';
+    location: string;
+    size: string;
+    logs: any[];
+};
+
+type UtilityDemo = {
+    id: string;
+    type: 'ELECTRICITY' | 'WATER' | 'DIESEL';
+    value: number;
+    unit: string;
+    recordedAt: string;
+    recordedBy?: { name: string };
+};
+
+type RequisitionDemo = {
+    id: string;
+    title: string;
+    description?: string;
+    status: 'PENDING' | 'APPROVED' | 'REJECTED';
+    requesterId: string;
+    requester: { name: string; email: string };
+    approverId?: string;
+    approver?: { name: string };
+    createdAt: string;
+};
+
 const delay = (ms = 400) => new Promise((resolve) => setTimeout(resolve, ms));
 
-let assets = [...demoAssets];
-let workOrders = [...demoWorkOrders];
-let users = [...demoUsers];
-let inventoryItems = [...demoInventoryItems];
-let suppliers = [...demoSuppliers];
-let preventivePlans = [...demoPreventivePlans];
-let oxygenCylinders = [...demoOxygenCylinders];
-let utilityReadings = [...demoUtilityReadings];
-let requisitions = [...demoRequisitions];
+let assets: AssetDemo[] = [...demoAssets];
+let workOrders: WorkOrderDemo[] = [...demoWorkOrders];
+let users: UserDemo[] = [...demoUsers];
+let inventoryItems: InventoryDemo[] = [...demoInventoryItems];
+let suppliers: SupplierDemo[] = [...demoSuppliers];
+let preventivePlans: PreventiveDemo[] = [...demoPreventivePlans];
+let oxygenCylinders: OxygenDemo[] = [...demoOxygenCylinders];
+let utilityReadings: UtilityDemo[] = [...demoUtilityReadings];
+let requisitions: RequisitionDemo[] = [...demoRequisitions];
 
 export const demoStore = {
     async getAssets() {
         await delay();
         return [...assets];
     },
-    async addAsset(asset: typeof assets[number]) {
+    async addAsset(asset: AssetDemo) {
         assets = [asset, ...assets];
         return asset;
     },
@@ -42,8 +115,8 @@ export const demoStore = {
         await delay();
         return workOrders.find((wo) => wo.id === id) ?? null;
     },
-    async addWorkOrder(data: Partial<typeof workOrders[number]>) {
-        const newWO = {
+    async addWorkOrder(data: Partial<WorkOrderDemo>) {
+        const newWO: WorkOrderDemo = {
             id: `wo-${Date.now()}`,
             title: data.title || 'Untitled request',
             description: data.description || 'No description provided.',
@@ -107,7 +180,7 @@ export const demoStore = {
         await delay();
         return [...users];
     },
-    async addUser(user: typeof users[number]) {
+    async addUser(user: UserDemo) {
         users = [user, ...users];
         return user;
     },
@@ -118,7 +191,7 @@ export const demoStore = {
         await delay();
         return [...inventoryItems];
     },
-    async addInventoryItem(item: typeof inventoryItems[number]) {
+    async addInventoryItem(item: InventoryDemo) {
         inventoryItems = [item, ...inventoryItems];
         return item;
     },
@@ -138,7 +211,7 @@ export const demoStore = {
         return [...suppliers];
     },
     async addSupplier(data: { name: string; email?: string; phone?: string; address?: string }) {
-        const newSupplier = { id: `sup-${Date.now()}`, ...data };
+        const newSupplier: SupplierDemo = { id: `sup-${Date.now()}`, ...data };
         suppliers = [newSupplier, ...suppliers];
         return newSupplier;
     },
@@ -146,7 +219,7 @@ export const demoStore = {
         await delay();
         return [...preventivePlans];
     },
-    async addPreventivePlan(data: typeof preventivePlans[number]) {
+    async addPreventivePlan(data: PreventiveDemo) {
         preventivePlans = [data, ...preventivePlans];
         return data;
     },
@@ -154,7 +227,7 @@ export const demoStore = {
         await delay();
         return [...oxygenCylinders];
     },
-    async addOxygenCylinder(data: typeof oxygenCylinders[number]) {
+    async addOxygenCylinder(data: OxygenDemo) {
         oxygenCylinders = [data, ...oxygenCylinders];
         return data;
     },
@@ -174,7 +247,7 @@ export const demoStore = {
         await delay();
         return [...utilityReadings];
     },
-    async addUtilityReading(data: typeof utilityReadings[number]) {
+    async addUtilityReading(data: UtilityDemo) {
         utilityReadings = [data, ...utilityReadings];
         return data;
     },
@@ -182,7 +255,7 @@ export const demoStore = {
         await delay();
         return [...requisitions];
     },
-    async addRequisition(data: typeof requisitions[number]) {
+    async addRequisition(data: RequisitionDemo) {
         requisitions = [data, ...requisitions];
         return data;
     },
