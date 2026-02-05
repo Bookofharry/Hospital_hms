@@ -346,11 +346,11 @@
   }
 
   .landing-nav {
-    @apply flex items-center justify-between px-6 py-6 md:px-12;
+    @apply fixed top-0 z-40 flex w-full items-center justify-between border-b border-slate-200/60 bg-white px-6 py-4 text-slate-900 shadow-sm md:px-12;
   }
 
   .landing-brand {
-    @apply flex items-center gap-3;
+    @apply flex items-center gap-3 text-slate-900;
   }
 
   .landing-actions {
@@ -358,7 +358,7 @@
   }
 
   .landing-hero {
-    @apply grid gap-10 px-6 pb-20 pt-6 md:grid-cols-2 md:px-12;
+    @apply grid gap-10 px-6 pb-20 pt-24 md:grid-cols-2 md:px-12;
   }
 
   .landing-hero-content h1 {
@@ -442,6 +442,42 @@
     @apply rounded-2xl border border-white/10 bg-white/5 p-6 text-slate-300;
   }
 
+  .logo-strip {
+    @apply mb-10 flex flex-col gap-3 text-xs uppercase tracking-[0.3em] text-slate-400;
+  }
+
+  .logo-row {
+    @apply flex flex-wrap gap-3;
+  }
+
+  .logo-pill {
+    @apply rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs text-slate-200;
+  }
+
+  .testimonial-grid {
+    @apply grid gap-6 md:grid-cols-3;
+  }
+
+  .testimonial-card {
+    @apply flex flex-col justify-between rounded-2xl border border-white/15 bg-white/5 p-6 text-slate-200;
+  }
+
+  .testimonial-meta {
+    @apply mt-4 flex items-center gap-3;
+  }
+
+  .testimonial-meta .avatar {
+    @apply flex h-10 w-10 items-center justify-center rounded-full bg-sky-400/30 text-sm font-semibold text-white;
+  }
+
+  .testimonial-meta .name {
+    @apply text-sm font-semibold text-white;
+  }
+
+  .testimonial-meta .role {
+    @apply text-xs text-slate-300;
+  }
+
   .pricing-grid {
     @apply grid gap-6 md:grid-cols-3;
   }
@@ -470,8 +506,28 @@
     @apply mt-4 space-y-2 text-sm text-slate-300;
   }
 
+  .pricing-action {
+    @apply mt-6;
+  }
+
   .landing-cta {
     @apply mx-6 mb-20 flex flex-col gap-6 rounded-3xl border border-white/15 bg-white/10 p-8 text-white md:mx-12 md:flex-row md:items-center md:justify-between;
+  }
+
+  .faq-grid {
+    @apply grid gap-6 md:grid-cols-2;
+  }
+
+  .faq-card {
+    @apply rounded-2xl border border-white/15 bg-white/5 p-6 text-slate-200;
+  }
+
+  .faq-card h3 {
+    @apply text-lg font-semibold text-white;
+  }
+
+  .faq-card p {
+    @apply mt-2 text-sm text-slate-300;
   }
 
   .cta-actions {
