@@ -42,7 +42,7 @@ export default function LandingPricing() {
 
         <div className="pricing-card">
           <h3>Enterprise</h3>
-          <p className="pricing-price">₦Custom</p>
+          <p className="pricing-price">Custom</p>
           <p className="pricing-note">For multi-site hospital networks.</p>
           <ul className="pricing-list">
             <li>SSO + advanced audit</li>
