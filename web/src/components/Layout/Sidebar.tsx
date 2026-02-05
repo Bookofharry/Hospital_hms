@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, ClipboardList, Box, Users, Settings, LogOut, Calendar, Package, FileText, Wrench, Activity, Zap } from 'lucide-react';
+import { LayoutDashboard, ClipboardList, Box, Users, Settings, LogOut, Calendar, Package, FileText, Wrench } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import clsx from 'clsx';
 

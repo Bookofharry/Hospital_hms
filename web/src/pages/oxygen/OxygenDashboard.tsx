@@ -5,7 +5,6 @@ import toast from 'react-hot-toast';
 
 export default function OxygenDashboard() {
     const [cylinders, setCylinders] = useState<OxygenCylinder[]>([]);
-    const [loading, setLoading] = useState(true);
     const [stats, setStats] = useState({ full: 0, empty: 0, inUse: 0 });
     const [showModal, setShowModal] = useState(false);
     const [formData, setFormData] = useState({ serialNumber: '', size: 'Jumbo', location: 'Main Store' });
@@ -26,8 +25,6 @@ export default function OxygenDashboard() {
             });
         } catch (error) {
             toast.error('Failed to load cylinders');
-        } finally {
-            setLoading(false);
         }
     };
 

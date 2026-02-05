@@ -5,7 +5,6 @@ import toast from 'react-hot-toast';
 
 export default function UtilityTracker() {
     const [readings, setReadings] = useState<UtilityReading[]>([]);
-    const [loading, setLoading] = useState(true);
     const [formData, setFormData] = useState({ type: 'ELECTRICITY', value: '', unit: 'kWh' });
 
     useEffect(() => {
@@ -18,8 +17,6 @@ export default function UtilityTracker() {
             setReadings(data);
         } catch (error) {
             toast.error('Failed to load readings');
-        } finally {
-            setLoading(false);
         }
     };
 
