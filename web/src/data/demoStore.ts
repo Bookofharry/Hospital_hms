@@ -61,8 +61,15 @@ type SupplierDemo = {
     address?: string;
 };
 
-type PreventiveDemo = Omit<(typeof demoPreventivePlans)[number], 'asset' | 'assignedTo' | 'description'> & {
+type PreventiveDemo = {
+    id: string;
+    name: string;
     description?: string;
+    frequency: 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'YEARLY';
+    assetId?: string;
+    assignedToId?: string;
+    nextDue: string;
+    isActive: boolean;
     asset?: { name: string };
     assignedTo?: { name: string };
 };
