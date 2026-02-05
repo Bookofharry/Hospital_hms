@@ -36,8 +36,7 @@ function App() {
         <NotificationProvider>
           <Toaster />
           <Routes>
-            <Route path="/" element={<Navigate to="/landing" replace />} />
-            <Route path="/landing" element={<LandingPage />} />
+            <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<Login />} />
 
             {/* Protected Routes */}

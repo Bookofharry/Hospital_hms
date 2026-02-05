@@ -55,6 +55,7 @@
 
   .app-content {
     @apply flex-1 overflow-y-auto px-6 py-6;
+    padding-top: 6rem;
   }
 
   .app-container {
@@ -111,11 +112,18 @@
   }
 
   .topbar {
-    @apply flex items-center justify-between gap-4 border-b border-slate-200/60 bg-white/70 px-6 py-4 backdrop-blur;
+    @apply fixed top-0 z-30 flex w-full items-center justify-between gap-4 border-b border-slate-200/60 bg-white px-6 py-4;
+  }
+
+  @media (min-width: 1024px) {
+    .topbar {
+      left: 18rem;
+      width: calc(100% - 18rem);
+    }
   }
 
   .topbar-search {
-    @apply w-72 rounded-full border border-slate-200/70 bg-white/80 py-2 pl-9 pr-4 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-200;
+    @apply w-72 rounded-full border border-slate-200/70 bg-white py-2 pl-9 pr-4 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-200;
   }
 
   .topbar-actions {
@@ -123,7 +131,7 @@
   }
 
   .topbar-user {
-    @apply flex items-center gap-3 rounded-full border border-slate-200/70 bg-white/80 px-3 py-1.5;
+    @apply flex items-center gap-3 rounded-full border border-slate-200/70 bg-white px-3 py-1.5;
   }
 
   .topbar-avatar {
@@ -432,6 +440,42 @@
 
   .feature-card {
     @apply rounded-2xl border border-white/10 bg-white/5 p-6 text-slate-300;
+  }
+
+  .pricing-grid {
+    @apply grid gap-6 md:grid-cols-3;
+  }
+
+  .pricing-card {
+    @apply relative rounded-2xl border border-white/15 bg-white/5 p-6 text-slate-200;
+  }
+
+  .pricing-card-highlight {
+    @apply border-sky-300/40 bg-white/10 shadow-2xl;
+  }
+
+  .pricing-badge {
+    @apply absolute right-4 top-4 rounded-full bg-sky-400/20 px-3 py-1 text-xs uppercase tracking-[0.2em] text-sky-200;
+  }
+
+  .pricing-price {
+    @apply mt-3 text-3xl font-semibold text-white;
+  }
+
+  .pricing-note {
+    @apply mt-2 text-sm text-slate-300;
+  }
+
+  .pricing-list {
+    @apply mt-4 space-y-2 text-sm text-slate-300;
+  }
+
+  .landing-cta {
+    @apply mx-6 mb-20 flex flex-col gap-6 rounded-3xl border border-white/15 bg-white/10 p-8 text-white md:mx-12 md:flex-row md:items-center md:justify-between;
+  }
+
+  .cta-actions {
+    @apply flex flex-wrap gap-3;
   }
 
   .feature-icon {

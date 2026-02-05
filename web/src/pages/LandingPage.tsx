@@ -116,6 +116,66 @@ export default function Landing() {
                 </div>
             </section>
 
+            <section className="landing-features">
+                <div className="section-head">
+                    <p className="section-eyebrow">Get Started</p>
+                    <h2>Launch in weeks, not months.</h2>
+                    <p>Choose a rollout path that matches your hospital size and compliance requirements.</p>
+                </div>
+
+                <div className="pricing-grid">
+                    <div className="pricing-card">
+                        <h3>Starter</h3>
+                        <p className="pricing-price">Free</p>
+                        <p className="pricing-note">For pilot teams and demo environments.</p>
+                        <ul className="pricing-list">
+                            <li>Up to 3 departments</li>
+                            <li>Work orders + assets</li>
+                            <li>Basic dashboards</li>
+                        </ul>
+                        <Link to="/login" className="btn-invert w-full">Start Pilot</Link>
+                    </div>
+
+                    <div className="pricing-card pricing-card-highlight">
+                        <div className="pricing-badge">Most Popular</div>
+                        <h3>Operations</h3>
+                        <p className="pricing-price">$1,200/mo</p>
+                        <p className="pricing-note">For multi-department hospital operations.</p>
+                        <ul className="pricing-list">
+                            <li>Unlimited work orders</li>
+                            <li>Preventive schedules</li>
+                            <li>Inventory + requisitions</li>
+                            <li>Analytics & exports</li>
+                        </ul>
+                        <Link to="/login" className="btn-invert w-full">Book a Demo</Link>
+                    </div>
+
+                    <div className="pricing-card">
+                        <h3>Enterprise</h3>
+                        <p className="pricing-price">Custom</p>
+                        <p className="pricing-note">For multi-site hospital networks.</p>
+                        <ul className="pricing-list">
+                            <li>SSO + advanced audit</li>
+                            <li>Custom integrations</li>
+                            <li>24/7 support</li>
+                        </ul>
+                        <Link to="/login" className="btn-invert w-full">Talk to Sales</Link>
+                    </div>
+                </div>
+            </section>
+
+            <section className="landing-cta">
+                <div>
+                    <p className="section-eyebrow">Ready to Modernize?</p>
+                    <h2>Bring HMMS to your facility this quarter.</h2>
+                    <p>Our onboarding team will map your assets, workflows, and SLAs in one week.</p>
+                </div>
+                <div className="cta-actions">
+                    <Link to="/login" className="btn-invert">Schedule Implementation</Link>
+                    <Link to="/login" className="btn-ghost-dark">Download Overview</Link>
+                </div>
+            </section>
+
             <footer className="landing-footer">
                 <div>
                     <div className="landing-brand">
