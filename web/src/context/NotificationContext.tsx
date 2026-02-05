@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import { useAuth } from './AuthContext';
 
 const SOCKET_URL = 'http://localhost:3000';
+const ENABLE_SOCKET = import.meta.env.VITE_ENABLE_SOCKET === 'true';
 
 interface NotificationContextType {
     socket: Socket | null;
@@ -18,7 +19,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     const socketRef = React.useRef<Socket | null>(null);
 
     useEffect(() => {
-        if (user) {
+        if (user && ENABLE_SOCKET) {
             // Connect to socket
             socketRef.current = io(SOCKET_URL);
 

@@ -1,15 +1,16 @@
 import { useEffect, useState } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
-import { Box, ClipboardList, CheckCircle, AlertTriangle } from 'lucide-react';
-import api from '../api/axios';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { Box, ClipboardList, CheckCircle, AlertTriangle, Activity, Wrench } from 'lucide-react';
+import { demoStore } from '../data/demoStore';
+import { demoPriorityStats, demoStatusStats } from '../data/demo';
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
+const COLORS = ['#0ea5e9', '#22c55e', '#f59e0b', '#f97316', '#6366f1'];
 
 interface DashboardStats {
     totalAssets: number;
-    totalWorkOrders: number;
-    statusData: { name: string; count: number }[];
-    priorityData: { name: string; count: number }[];
+    activeWorkOrders: number;
+    lowStockItems: number;
+    emptyCylinders: number;
 }
 
 export default function Dashboard() {
@@ -17,136 +18,161 @@ export default function Dashboard() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetchStats();
+        const load = async () => {
+            const data = await demoStore.getDashboardStats();
+            setStats(data as DashboardStats);
+            setLoading(false);
+        };
+        load();
     }, []);
 
-    const fetchStats = async () => {
-        try {
-            const response = await api.get('/reports/dashboard-stats');
-            setStats(response.data);
-        } catch (error) {
-            console.error('Failed to fetch dashboard stats', error);
-            console.warn('Backend unavailable, using mock data for dashboard.');
-            setStats({
-                totalAssets: 124,
-                totalWorkOrders: 45,
-                statusData: [
-                    { name: 'PENDING', count: 12 },
-                    { name: 'ASSIGNED', count: 8 },
-                    { name: 'IN_PROGRESS', count: 15 },
-                    { name: 'COMPLETED', count: 10 },
-                ],
-                priorityData: [
-                    { name: 'LOW', count: 20 },
-                    { name: 'MEDIUM', count: 15 },
-                    { name: 'HIGH', count: 8 },
-                    { name: 'CRITICAL', count: 2 },
-                ]
-            });
-        } finally {
-            setLoading(false);
-        }
-    };
-
     if (loading) {
-        return <div className="p-8 text-center text-gray-500">Loading dashboard...</div>;
+        return <div className="empty-state">Loading dashboard...</div>;
     }
 
     if (!stats) {
-        return <div className="p-8 text-center text-red-500">Failed to load data.</div>;
+        return <div className="empty-state">Failed to load data.</div>;
     }
 
     return (
-        <div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-6">Dashboard</h1>
+        <div className="page">
+            <div className="page-header">
+                <div>
+                    <p className="page-eyebrow">Executive Overview</p>
+                    <h1 className="page-title">Operations Dashboard</h1>
+                    <p className="page-subtitle">Real-time visibility across maintenance, assets, and compliance trends.</p>
+                </div>
+                <button className="btn-secondary">
+                    <Activity className="h-4 w-4" />
+                    Export Snapshot
+                </button>
+            </div>
 
-            {/* KPI Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 flex items-center">
-                    <div className="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
-                        <Box size={24} />
-                    </div>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+                <div className="kpi-card">
                     <div>
-                        <p className="text-sm font-medium text-gray-500">Total Assets</p>
-                        <p className="text-2xl font-bold text-gray-900">{stats.totalAssets}</p>
+                        <p className="kpi-label">Total Assets</p>
+                        <p className="kpi-value">{stats.totalAssets}</p>
+                        <p className="kpi-meta">Across all departments</p>
+                    </div>
+                    <div className="kpi-icon kpi-icon-indigo">
+                        <Box size={22} />
                     </div>
                 </div>
 
-                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 flex items-center">
-                    <div className="p-3 rounded-full bg-purple-100 text-purple-600 mr-4">
-                        <ClipboardList size={24} />
-                    </div>
+                <div className="kpi-card">
                     <div>
-                        <p className="text-sm font-medium text-gray-500">Total Work Orders</p>
-                        <p className="text-2xl font-bold text-gray-900">{stats.totalWorkOrders}</p>
+                        <p className="kpi-label">Active Work Orders</p>
+                        <p className="kpi-value">{stats.activeWorkOrders}</p>
+                        <p className="kpi-meta">Open & in progress</p>
+                    </div>
+                    <div className="kpi-icon kpi-icon-sky">
+                        <ClipboardList size={22} />
                     </div>
                 </div>
 
-                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 flex items-center">
-                    <div className="p-3 rounded-full bg-green-100 text-green-600 mr-4">
-                        <CheckCircle size={24} />
-                    </div>
+                <div className="kpi-card">
                     <div>
-                        <p className="text-sm font-medium text-gray-500">Completed Jobs</p>
-                        <p className="text-2xl font-bold text-gray-900">
-                            {stats.statusData.find(s => s.name === 'COMPLETED')?.count || 0}
-                        </p>
+                        <p className="kpi-label">Low Stock Items</p>
+                        <p className="kpi-value">{stats.lowStockItems}</p>
+                        <p className="kpi-meta">Reorder recommended</p>
+                    </div>
+                    <div className="kpi-icon kpi-icon-amber">
+                        <AlertTriangle size={22} />
                     </div>
                 </div>
 
-                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 flex items-center">
-                    <div className="p-3 rounded-full bg-red-100 text-red-600 mr-4">
-                        <AlertTriangle size={24} />
-                    </div>
+                <div className="kpi-card">
                     <div>
-                        <p className="text-sm font-medium text-gray-500">Critical Issues</p>
-                        <p className="text-2xl font-bold text-gray-900">
-                            {stats.priorityData.find(s => s.name === 'CRITICAL')?.count || 0}
-                        </p>
+                        <p className="kpi-label">Empty Cylinders</p>
+                        <p className="kpi-value">{stats.emptyCylinders}</p>
+                        <p className="kpi-meta">Oxygen movement</p>
+                    </div>
+                    <div className="kpi-icon kpi-icon-rose">
+                        <CheckCircle size={22} />
                     </div>
                 </div>
             </div>
 
-            {/* Charts */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="bg-white p-6 rounded-lg shadow-sm">
-                    <h2 className="text-lg font-bold text-gray-900 mb-4">Work Order Status</h2>
-                    <div className="h-64">
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                <div className="surface-card">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h2 className="section-title">Work Order Status</h2>
+                            <p className="section-subtitle">Distribution across current queue.</p>
+                        </div>
+                        <div className="chip chip-neutral">Last 7 days</div>
+                    </div>
+                    <div className="mt-6 h-64">
                         <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={stats.statusData}>
+                            <BarChart data={demoStatusStats}>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                                 <XAxis dataKey="name" tick={{ fontSize: 12 }} />
                                 <YAxis allowDecimals={false} />
                                 <Tooltip />
-                                <Bar dataKey="count" fill="#3B82F6" radius={[4, 4, 0, 0]} />
+                                <Bar dataKey="count" fill="#38bdf8" radius={[6, 6, 0, 0]} />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
                 </div>
 
-                <div className="bg-white p-6 rounded-lg shadow-sm">
-                    <h2 className="text-lg font-bold text-gray-900 mb-4">Request Priority</h2>
-                    <div className="h-64">
+                <div className="surface-card">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h2 className="section-title">Priority Mix</h2>
+                            <p className="section-subtitle">Critical workload distribution.</p>
+                        </div>
+                        <div className="chip chip-neutral">This month</div>
+                    </div>
+                    <div className="mt-6 h-64">
                         <ResponsiveContainer width="100%" height="100%">
                             <PieChart>
                                 <Pie
-                                    data={stats.priorityData}
+                                    data={demoPriorityStats}
                                     cx="50%"
                                     cy="50%"
                                     innerRadius={60}
-                                    outerRadius={80}
-                                    fill="#8884d8"
+                                    outerRadius={90}
                                     paddingAngle={5}
                                     dataKey="count"
                                 >
-                                    {stats.priorityData.map((_entry, index) => (
+                                    {demoPriorityStats.map((_entry, index) => (
                                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                     ))}
                                 </Pie>
                                 <Tooltip />
-                                <Legend />
                             </PieChart>
                         </ResponsiveContainer>
+                    </div>
+                </div>
+            </div>
+
+            <div className="surface-card">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h2 className="section-title">Today’s Focus</h2>
+                        <p className="section-subtitle">Recommended next actions based on SLA targets.</p>
+                    </div>
+                    <button className="btn-secondary">
+                        <Wrench className="h-4 w-4" />
+                        View Queue
+                    </button>
+                </div>
+                <div className="mt-4 grid gap-3 md:grid-cols-3">
+                    <div className="rounded-xl border border-slate-200/70 bg-white/80 p-4">
+                        <p className="text-sm font-semibold text-slate-700">Escalations due</p>
+                        <p className="mt-2 text-2xl font-semibold text-slate-900">3</p>
+                        <p className="text-xs text-slate-500">Critical issues within 4 hours</p>
+                    </div>
+                    <div className="rounded-xl border border-slate-200/70 bg-white/80 p-4">
+                        <p className="text-sm font-semibold text-slate-700">Preventive checks</p>
+                        <p className="mt-2 text-2xl font-semibold text-slate-900">7</p>
+                        <p className="text-xs text-slate-500">Upcoming this week</p>
+                    </div>
+                    <div className="rounded-xl border border-slate-200/70 bg-white/80 p-4">
+                        <p className="text-sm font-semibold text-slate-700">Inventory alerts</p>
+                        <p className="mt-2 text-2xl font-semibold text-slate-900">6</p>
+                        <p className="text-xs text-slate-500">Below minimum stock</p>
                     </div>
                 </div>
             </div>

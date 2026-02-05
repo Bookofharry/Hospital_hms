@@ -1,0 +1,265 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+  TECHNICIAN
+  STAFF
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum WorkOrderStatus {
+  PENDING
+  ASSIGNED
+  IN_PROGRESS
+  COMPLETED
+  CLOSED
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(TECHNICIAN)
+  pushToken String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  section   String?
+  status    UserStatus @default(ACTIVE)
+  
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id])
+
+  workOrdersAssigned WorkOrder[] @relation("AssignedWorkOrders")
+  workOrdersCreated  WorkOrder[] @relation("CreatedWorkOrders")
+  timeLogs           WorkOrderTimeLog[]
+  assignedPreventivePlans PreventivePlan[]
+  utilityReadings    UtilityReading[]
+  requisitionsCreated  Requisition[] @relation("requester")
+  requisitionsApproved Requisition[] @relation("approver")
+}
+
+model Department {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  code      String?
+  users     User[]
+}
+
+model Asset {
+  id             String   @id @default(uuid())
+  name           String
+  model          String?
+  serialNumber   String?  @unique
+  location       String?
+  purchaseDate   DateTime?
+  warrantyExpiry DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  workOrders WorkOrder[]
+  preventivePlans PreventivePlan[]
+}
+
+enum Frequency {
+  DAILY
+  WEEKLY
+  MONTHLY
+  YEARLY
+}
+
+model PreventivePlan {
+  id              String      @id @default(uuid())
+  name            String
+  description     String?
+  frequency       Frequency
+  assetId         String?
+  asset           Asset?      @relation(fields: [assetId], references: [id])
+  assignedToId    String?
+  assignedTo      User?       @relation(fields: [assignedToId], references: [id])
+  nextDue         DateTime
+  isActive        Boolean     @default(true)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+model WorkOrder {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  priority    Priority @default(MEDIUM)
+  status      WorkOrderStatus @default(PENDING)
+  
+  assetId     String?
+  asset       Asset?   @relation(fields: [assetId], references: [id])
+  
+  assignedToId String?
+  assignedTo   User?   @relation("AssignedWorkOrders", fields: [assignedToId], references: [id])
+  
+  createdById String
+  createdBy   User    @relation("CreatedWorkOrders", fields: [createdById], references: [id])
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  attachments Attachment[]
+  timeLogs    WorkOrderTimeLog[]
+  inventoryTransactions InventoryTransaction[]
+}
+
+model Attachment {
+  id        String   @id @default(uuid())
+  url       String
+  fileType  String
+  fileName  String
+
+  workOrderId String
+  workOrder   WorkOrder @relation(fields: [workOrderId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model WorkOrderTimeLog {
+  id          String   @id @default(uuid())
+  minutes     Int
+  description String?
+  
+  workOrderId String
+  workOrder   WorkOrder @relation(fields: [workOrderId], references: [id])
+  
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+
+  createdAt   DateTime @default(now())
+}
+
+model Supplier {
+  id           String          @id @default(uuid())
+  name         String
+  contactEmail String?
+  phone        String?
+  address      String?
+  items        InventoryItem[]
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+}
+
+model InventoryItem {
+  id           String                 @id @default(uuid())
+  name         String
+  sku          String                 @unique
+  description  String?
+  quantity     Int                    @default(0)
+  minimumStock Int                    @default(10)
+  unit         String
+  supplierId   String?
+  supplier     Supplier?              @relation(fields: [supplierId], references: [id])
+  transactions InventoryTransaction[]
+  createdAt    DateTime               @default(now())
+  updatedAt    DateTime               @updatedAt
+}
+
+enum TransactionType {
+  IN
+  OUT
+  ADJUSTMENT
+}
+
+model InventoryTransaction {
+  id          String          @id @default(uuid())
+  itemId      String
+  item        InventoryItem   @relation(fields: [itemId], references: [id])
+  quantity    Int
+  type        TransactionType
+  workOrderId String?
+  workOrder   WorkOrder?      @relation(fields: [workOrderId], references: [id])
+  notes       String?
+  date        DateTime        @default(now())
+}
+
+enum CylinderStatus {
+  FULL
+  EMPTY
+  IN_USE
+}
+
+enum CylinderAction {
+  RECEIVED
+  ISSUED
+  RETURNED_EMPTY
+  SENT_TO_REFILL
+}
+
+model OxygenCylinder {
+  id           String          @id @default(uuid())
+  serialNumber String          @unique
+  status       CylinderStatus  @default(FULL)
+  location     String          @default("Main Store")
+  size         String          @default("Jumbo")
+  logs         CylinderLog[]
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+}
+
+model CylinderLog {
+  id          String         @id @default(uuid())
+  cylinderId  String
+  cylinder    OxygenCylinder @relation(fields: [cylinderId], references: [id])
+  action      CylinderAction
+  location    String
+  timestamp   DateTime       @default(now())
+}
+
+enum UtilityType {
+  ELECTRICITY
+  WATER
+  DIESEL
+}
+
+model UtilityReading {
+  id           String      @id @default(uuid())
+  type         UtilityType
+  value        Float
+  unit         String
+  recordedAt   DateTime    @default(now())
+  recordedById String
+  recordedBy   User        @relation(fields: [recordedById], references: [id])
+}
+
+enum RequisitionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model Requisition {
+  id          String            @id @default(uuid())
+  title       String
+  description String?
+  status      RequisitionStatus @default(PENDING)
+  requesterId String
+  requester   User              @relation("requester", fields: [requesterId], references: [id])
+  approverId  String?
+  approver    User?             @relation("approver", fields: [approverId], references: [id])
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+}

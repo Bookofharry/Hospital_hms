@@ -1,5 +1,19 @@
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, ClipboardList, Box, Users, Settings, LogOut, Calendar, Package, FileText, Wrench } from 'lucide-react';
+import {
+    LayoutDashboard,
+    ClipboardList,
+    Box,
+    Users,
+    Settings,
+    LogOut,
+    Calendar,
+    Package,
+    FileText,
+    Wrench,
+    Activity,
+    Zap,
+    Droplet
+} from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import clsx from 'clsx';
 
@@ -8,16 +22,19 @@ export default function Sidebar() {
     const { user, logout } = useAuth();
 
     const navigation = [
-        { name: 'Dashboard', href: '/', icon: LayoutDashboard, roles: ['ADMIN', 'MANAGER', 'TECHNICIAN', 'STAFF'] },
-        { name: 'Assets', href: '/assets', icon: Box, roles: ['ADMIN', 'MANAGER', 'TECHNICIAN'] },
+        { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, roles: ['ADMIN', 'MANAGER', 'TECHNICIAN'] },
         { name: 'Work Orders', href: '/work-orders', icon: Wrench, roles: ['ADMIN', 'MANAGER', 'TECHNICIAN', 'STAFF'] },
+        { name: 'Assets', href: '/assets', icon: Box, roles: ['ADMIN', 'MANAGER', 'TECHNICIAN'] },
         { name: 'Preventive', href: '/preventive', icon: ClipboardList, roles: ['ADMIN', 'MANAGER'] },
         { name: 'Calendar', href: '/preventive-calendar', icon: Calendar, roles: ['ADMIN', 'MANAGER'] },
         { name: 'Inventory', href: '/inventory', icon: Package, roles: ['ADMIN', 'MANAGER'] },
-        { name: 'Suppliers', href: '/suppliers', icon: Users, roles: ['ADMIN', 'MANAGER'] }, // Re-using User icon for now
-        { name: 'Reports', href: '/reports', icon: FileText, roles: ['ADMIN', 'MANAGER'] },
-        { name: 'Settings', href: '/settings', icon: Settings, roles: ['ADMIN'] },
+        { name: 'Suppliers', href: '/suppliers', icon: Users, roles: ['ADMIN', 'MANAGER'] },
+        { name: 'Oxygen', href: '/oxygen', icon: Activity, roles: ['ADMIN', 'MANAGER', 'TECHNICIAN'] },
+        { name: 'Utilities', href: '/utilities', icon: Droplet, roles: ['ADMIN', 'MANAGER'] },
+        { name: 'Requisitions', href: '/requisitions', icon: FileText, roles: ['ADMIN', 'MANAGER', 'STAFF'] },
+        { name: 'Reports', href: '/reports', icon: Zap, roles: ['ADMIN', 'MANAGER'] },
         { name: 'Users', href: '/users', icon: Users, roles: ['ADMIN'] },
+        { name: 'Settings', href: '/settings', icon: Settings, roles: ['ADMIN'] }
     ];
 
     const filteredNavigation = navigation.filter(item => {
@@ -26,51 +43,51 @@ export default function Sidebar() {
     });
 
     return (
-        <div className="flex flex-col w-64 bg-slate-900 min-h-screen text-white">
-            <div className="flex items-center justify-center h-16 border-b border-slate-800">
-                <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-teal-400">
-                    HMMS Portal
-                </span>
+        <aside className="sidebar">
+            <div className="sidebar-brand">
+                <div className="brand-mark">
+                    <Activity className="h-6 w-6" />
+                </div>
+                <div>
+                    <p className="brand-title">HMMS</p>
+                    <p className="brand-subtitle">Maintenance Portal</p>
+                </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto py-4">
-                <nav className="space-y-1 px-2">
-                    {filteredNavigation.map((item) => {
-                        const isActive = location.pathname === item.href;
-                        return (
-                            <Link
-                                key={item.name}
-                                to={item.href}
-                                className={clsx(
-                                    isActive
-                                        ? 'bg-slate-800 text-white'
-                                        : 'text-slate-300 hover:bg-slate-800 hover:text-white',
-                                    'group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors'
-                                )}
-                            >
-                                <item.icon
-                                    className={clsx(
-                                        isActive ? 'text-blue-400' : 'text-slate-400 group-hover:text-white',
-                                        'mr-3 flex-shrink-0 h-6 w-6 transition-colors'
-                                    )}
-                                    aria-hidden="true"
-                                />
-                                {item.name}
-                            </Link>
-                        );
-                    })}
-                </nav>
-            </div>
+            <nav className="sidebar-nav">
+                {filteredNavigation.map((item) => {
+                    const isActive = location.pathname === item.href;
+                    return (
+                        <Link
+                            key={item.name}
+                            to={item.href}
+                            className={clsx('sidebar-link', isActive && 'sidebar-link-active')}
+                        >
+                            <item.icon className="h-5 w-5" aria-hidden="true" />
+                            {item.name}
+                        </Link>
+                    );
+                })}
+            </nav>
 
-            <div className="p-4 border-t border-slate-800">
+            <div className="sidebar-footer">
+                <div className="sidebar-user">
+                    <div className="sidebar-avatar">
+                        {user?.name?.[0] || 'U'}
+                    </div>
+                    <div>
+                        <p className="text-sm font-medium text-white">{user?.name || 'User'}</p>
+                        <p className="text-xs text-slate-300 uppercase tracking-wide">{user?.role || 'ROLE'}</p>
+                    </div>
+                </div>
                 <button
                     onClick={logout}
-                    className="flex items-center w-full px-2 py-2 text-sm font-medium text-slate-300 rounded-md hover:bg-slate-800 hover:text-white transition-colors"
+                    className="sidebar-logout"
                 >
-                    <LogOut className="mr-3 h-6 w-6 text-slate-400" />
+                    <LogOut className="h-4 w-4" />
                     Sign Out
                 </button>
             </div>
-        </div>
+        </aside>
     );
 }

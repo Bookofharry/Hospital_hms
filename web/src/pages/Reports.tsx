@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { getDashboardStats, getWorkOrderStats, getAssetHealth, getUtilityTrends, type DashboardStats, type ChartData, type UtilityReading } from '../services/reportService';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 import { Activity, AlertTriangle, Package, Zap } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
+const COLORS = ['#0ea5e9', '#22c55e', '#f59e0b', '#f97316', '#6366f1'];
 
 export default function Reports() {
     const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -36,66 +36,69 @@ export default function Reports() {
         }
     };
 
-    if (loading) return <div className="p-6">Loading reports...</div>;
+    if (loading) return <div className="empty-state">Loading reports...</div>;
 
     return (
-        <div className="p-6">
-            <h1 className="text-2xl font-bold text-gray-800 mb-6">Reports & Analytics</h1>
+        <div className="page">
+            <div className="page-header">
+                <div>
+                    <p className="page-eyebrow">Reports</p>
+                    <h1 className="page-title">Analytics & Insights</h1>
+                    <p className="page-subtitle">Track performance, asset health, and utility trends.</p>
+                </div>
+                <button className="btn-secondary">Export PDF</button>
+            </div>
 
-            {/* KPI Cards */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                <div className="kpi-card">
                     <div>
-                        <div className="text-sm text-gray-500">Active Work Orders</div>
-                        <div className="text-2xl font-bold text-blue-600">{stats?.activeWorkOrders}</div>
+                        <div className="kpi-label">Active Work Orders</div>
+                        <div className="kpi-value text-sky-600">{stats?.activeWorkOrders}</div>
                     </div>
-                    <Activity className="text-blue-100 bg-blue-600 p-2 rounded-lg" size={40} />
+                    <div className="kpi-icon kpi-icon-sky"><Activity size={20} /></div>
                 </div>
-                <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                <div className="kpi-card">
                     <div>
-                        <div className="text-sm text-gray-500">Total Assets</div>
-                        <div className="text-2xl font-bold text-gray-800">{stats?.totalAssets}</div>
+                        <div className="kpi-label">Total Assets</div>
+                        <div className="kpi-value">{stats?.totalAssets}</div>
                     </div>
-                    <Package className="text-gray-100 bg-gray-600 p-2 rounded-lg" size={40} />
+                    <div className="kpi-icon kpi-icon-indigo"><Package size={20} /></div>
                 </div>
-                <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                <div className="kpi-card">
                     <div>
-                        <div className="text-sm text-gray-500">Low Stock Items</div>
-                        <div className="text-2xl font-bold text-orange-600">{stats?.lowStockItems}</div>
+                        <div className="kpi-label">Low Stock Items</div>
+                        <div className="kpi-value text-orange-600">{stats?.lowStockItems}</div>
                     </div>
-                    <AlertTriangle className="text-orange-100 bg-orange-600 p-2 rounded-lg" size={40} />
+                    <div className="kpi-icon kpi-icon-amber"><AlertTriangle size={20} /></div>
                 </div>
-                <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                <div className="kpi-card">
                     <div>
-                        <div className="text-sm text-gray-500">Empty Cylinders</div>
-                        <div className="text-2xl font-bold text-red-600">{stats?.emptyCylinders}</div>
+                        <div className="kpi-label">Empty Cylinders</div>
+                        <div className="kpi-value text-rose-600">{stats?.emptyCylinders}</div>
                     </div>
-                    <Zap className="text-red-100 bg-red-600 p-2 rounded-lg" size={40} />
+                    <div className="kpi-icon kpi-icon-rose"><Zap size={20} /></div>
                 </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Work Order Breakdown */}
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h2 className="text-lg font-semibold mb-4">Work Order Status</h2>
-                    <div className="h-64">
+                <div className="surface-card">
+                    <h2 className="section-title">Work Order Status</h2>
+                    <div className="h-64 mt-4">
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={woStats}>
                                 <CartesianGrid strokeDasharray="3 3" />
                                 <XAxis dataKey="name" />
                                 <YAxis />
                                 <Tooltip />
-                                <Legend />
-                                <Bar dataKey="value" fill="#3b82f6" name="Count" />
+                                <Bar dataKey="value" fill="#38bdf8" name="Count" radius={[6, 6, 0, 0]} />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
                 </div>
 
-                {/* Asset Health */}
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h2 className="text-lg font-semibold mb-4">Asset Health</h2>
-                    <div className="h-64">
+                <div className="surface-card">
+                    <h2 className="section-title">Asset Health</h2>
+                    <div className="h-64 mt-4">
                         <ResponsiveContainer width="100%" height="100%">
                             <PieChart>
                                 <Pie
@@ -104,7 +107,7 @@ export default function Reports() {
                                     cy="50%"
                                     labelLine={false}
                                     label={({ name, percent }: any) => `${name || ''} ${((percent || 0) * 100).toFixed(0)}%`}
-                                    outerRadius={80}
+                                    outerRadius={90}
                                     fill="#8884d8"
                                     dataKey="value"
                                 >
@@ -118,18 +121,16 @@ export default function Reports() {
                     </div>
                 </div>
 
-                {/* Utility Trends (Simplified) */}
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 lg:col-span-2">
-                    <h2 className="text-lg font-semibold mb-4">Recent Utility Readings</h2>
-                    <div className="h-64">
+                <div className="surface-card lg:col-span-2">
+                    <h2 className="section-title">Utility Trends</h2>
+                    <div className="h-64 mt-4">
                         <ResponsiveContainer width="100%" height="100%">
                             <LineChart data={utilityData}>
                                 <CartesianGrid strokeDasharray="3 3" />
                                 <XAxis dataKey="recordedAt" tickFormatter={(val) => new Date(val).toLocaleDateString()} />
                                 <YAxis />
                                 <Tooltip labelFormatter={(val) => new Date(val).toLocaleString()} />
-                                <Legend />
-                                <Line type="monotone" dataKey="value" stroke="#82ca9d" name="Value" />
+                                <Line type="monotone" dataKey="value" stroke="#22c55e" name="Value" strokeWidth={2} />
                             </LineChart>
                         </ResponsiveContainer>
                     </div>

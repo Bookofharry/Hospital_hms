@@ -1,4 +1,4 @@
-import api from './api';
+import { demoStore } from '../data/demoStore';
 
 export interface PreventivePlan {
     id: string;
@@ -14,11 +14,21 @@ export interface PreventivePlan {
 }
 
 export const getPreventivePlans = async (): Promise<PreventivePlan[]> => {
-    const response = await api.get('/preventive');
-    return response.data;
+    return demoStore.getPreventivePlans();
 };
 
 export const createPreventivePlan = async (data: Partial<PreventivePlan>) => {
-    const response = await api.post('/preventive', data);
-    return response.data;
+    const newPlan: PreventivePlan = {
+        id: `pm-${Date.now()}`,
+        name: data.name || 'New Plan',
+        description: data.description,
+        frequency: (data.frequency as PreventivePlan['frequency']) || 'MONTHLY',
+        assetId: data.assetId,
+        assignedToId: data.assignedToId,
+        nextDue: data.nextDue || new Date().toISOString(),
+        isActive: true,
+        asset: data.asset,
+        assignedTo: data.assignedTo
+    };
+    return demoStore.addPreventivePlan(newPlan as any);
 };

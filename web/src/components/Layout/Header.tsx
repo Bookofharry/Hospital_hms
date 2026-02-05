@@ -1,22 +1,30 @@
 import { useAuth } from '../../context/AuthContext';
-import { User } from 'lucide-react';
+import { Bell, Search } from 'lucide-react';
 
 export default function Header() {
     const { user } = useAuth();
 
     return (
-        <header className="bg-white border-b border-gray-200 h-16 px-6 flex items-center justify-between shadow-sm">
-            <div className="flex items-center">
-                {/* Breadcrumb or Page Title can go here */}
+        <header className="topbar">
+            <div className="relative hidden md:block">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <input
+                    type="text"
+                    placeholder="Search assets, work orders..."
+                    className="topbar-search"
+                />
             </div>
 
-            <div className="flex items-center space-x-4">
-                <div className="text-right hidden md:block">
-                    <p className="text-sm font-medium text-gray-900">{user?.name}</p>
-                    <p className="text-xs text-gray-500 uppercase">{user?.role}</p>
-                </div>
-                <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center ring-2 ring-white shadow-sm">
-                    <User className="h-6 w-6 text-blue-600" />
+            <div className="topbar-actions">
+                <button className="icon-button" aria-label="Notifications">
+                    <Bell className="h-4 w-4" />
+                </button>
+                <div className="topbar-user">
+                    <div className="topbar-avatar">{user?.name?.[0] || 'U'}</div>
+                    <div className="hidden md:block">
+                        <p className="text-sm font-semibold text-slate-800">{user?.name}</p>
+                        <p className="text-xs text-slate-500 uppercase">{user?.role}</p>
+                    </div>
                 </div>
             </div>
         </header>

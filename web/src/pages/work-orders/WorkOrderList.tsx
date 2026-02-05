@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Filter, Search } from 'lucide-react';
-import api from '../../api/axios';
+import { Plus, Filter, Search, Clock, MapPin } from 'lucide-react';
 import clsx from 'clsx';
+import { demoStore } from '../../data/demoStore';
 
 interface WorkOrder {
     id: string;
@@ -14,19 +14,19 @@ interface WorkOrder {
     createdAt: string;
 }
 
-const statusColors: Record<string, string> = {
-    PENDING: 'bg-yellow-100 text-yellow-800',
-    ASSIGNED: 'bg-blue-100 text-blue-800',
-    IN_PROGRESS: 'bg-indigo-100 text-indigo-800',
-    COMPLETED: 'bg-green-100 text-green-800',
-    CLOSED: 'bg-gray-100 text-gray-800',
+const statusClasses: Record<string, string> = {
+    PENDING: 'chip-amber',
+    ASSIGNED: 'chip-indigo',
+    IN_PROGRESS: 'chip-sky',
+    COMPLETED: 'chip-emerald',
+    CLOSED: 'chip-neutral'
 };
 
-const priorityColors: Record<string, string> = {
-    LOW: 'text-gray-500',
-    MEDIUM: 'text-blue-500',
-    HIGH: 'text-orange-500',
-    CRITICAL: 'text-red-600 font-bold',
+const priorityClasses: Record<string, string> = {
+    LOW: 'text-slate-500',
+    MEDIUM: 'text-sky-600',
+    HIGH: 'text-orange-600',
+    CRITICAL: 'text-rose-600 font-semibold'
 };
 
 export default function WorkOrderList() {
@@ -35,98 +35,127 @@ export default function WorkOrderList() {
     const [filter, setFilter] = useState('');
 
     useEffect(() => {
-        fetchWorkOrders();
+        const load = async () => {
+            const data = await demoStore.getWorkOrders();
+            setWorkOrders(data as WorkOrder[]);
+            setLoading(false);
+        };
+        load();
     }, []);
 
-    const fetchWorkOrders = async () => {
-        try {
-            const response = await api.get('/work-orders');
-            setWorkOrders(response.data);
-        } catch (error) {
-            console.error('Failed to fetch work orders', error);
-        } finally {
-            setLoading(false);
-        }
-    };
+    const filteredOrders = useMemo(() => (
+        workOrders.filter(wo =>
+            wo.title.toLowerCase().includes(filter.toLowerCase()) ||
+            wo.asset?.name.toLowerCase().includes(filter.toLowerCase())
+        )
+    ), [workOrders, filter]);
 
-    const filteredOrders = workOrders.filter(wo =>
-        wo.title.toLowerCase().includes(filter.toLowerCase()) ||
-        wo.asset?.name.toLowerCase().includes(filter.toLowerCase())
-    );
+    const stats = useMemo(() => {
+        const pending = workOrders.filter(wo => wo.status === 'PENDING').length;
+        const inProgress = workOrders.filter(wo => wo.status === 'IN_PROGRESS').length;
+        const critical = workOrders.filter(wo => wo.priority === 'CRITICAL').length;
+        return { pending, inProgress, critical };
+    }, [workOrders]);
 
     return (
-        <div>
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold text-gray-900">Work Orders</h1>
-                <Link
-                    to="/work-orders/new"
-                    className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
-                >
-                    <Plus className="-ml-1 mr-2 h-5 w-5" />
+        <div className="page">
+            <div className="page-header">
+                <div>
+                    <p className="page-eyebrow">Work Orders</p>
+                    <h1 className="page-title">Requests & Assignments</h1>
+                    <p className="page-subtitle">Track every request, prioritize urgent tasks, and keep response times on target.</p>
+                </div>
+                <Link to="/work-orders/new" className="btn-primary">
+                    <Plus className="h-5 w-5" />
                     Create Request
                 </Link>
             </div>
 
-            <div className="bg-white p-4 rounded-lg shadow-sm mb-6 flex gap-4">
-                <div className="relative flex-1">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <Search className="h-5 w-5 text-gray-400" />
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                <div className="kpi-card">
+                    <div>
+                        <p className="kpi-label">Pending</p>
+                        <p className="kpi-value">{stats.pending}</p>
                     </div>
-                    <input
-                        type="text"
-                        className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                        placeholder="Search work orders..."
-                        value={filter}
-                        onChange={(e) => setFilter(e.target.value)}
-                    />
+                    <div className="kpi-icon kpi-icon-amber">
+                        <Clock size={20} />
+                    </div>
                 </div>
-                <button className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
-                    <Filter className="mr-2 h-5 w-5 text-gray-400" />
-                    Filter
-                </button>
+                <div className="kpi-card">
+                    <div>
+                        <p className="kpi-label">In Progress</p>
+                        <p className="kpi-value">{stats.inProgress}</p>
+                    </div>
+                    <div className="kpi-icon kpi-icon-sky">
+                        <Clock size={20} />
+                    </div>
+                </div>
+                <div className="kpi-card">
+                    <div>
+                        <p className="kpi-label">Critical</p>
+                        <p className="kpi-value">{stats.critical}</p>
+                    </div>
+                    <div className="kpi-icon kpi-icon-rose">
+                        <Clock size={20} />
+                    </div>
+                </div>
+            </div>
+
+            <div className="surface-card mt-6">
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                    <div>
+                        <h2 className="section-title">Active Queue</h2>
+                        <p className="section-subtitle">Search by title or asset.</p>
+                    </div>
+                    <div className="flex w-full flex-col gap-3 md:w-auto md:flex-row">
+                        <div className="relative w-full md:w-72">
+                            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                            <input
+                                type="text"
+                                className="input input-with-icon"
+                                placeholder="Search work orders..."
+                                value={filter}
+                                onChange={(e) => setFilter(e.target.value)}
+                            />
+                        </div>
+                        <button className="btn-secondary">
+                            <Filter className="h-4 w-4" />
+                            Filters
+                        </button>
+                    </div>
+                </div>
             </div>
 
             {loading ? (
-                <div className="text-center py-10">Loading...</div>
+                <div className="empty-state">Loading work orders...</div>
             ) : (
-                <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-                    <ul className="divide-y divide-gray-200">
-                        {filteredOrders.map((wo) => (
-                            <li key={wo.id} className="hover:bg-gray-50">
-                                <Link to={`/work-orders/${wo.id}`} className="block px-4 py-4 sm:px-6">
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center truncate">
-                                            <p className="text-sm font-medium text-blue-600 truncate">{wo.title}</p>
-                                            <span className={clsx("ml-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full", statusColors[wo.status])}>
-                                                {wo.status.replace('_', ' ')}
-                                            </span>
-                                        </div>
-                                        <div className="ml-2 flex-shrink-0 flex">
-                                            <p className={clsx("px-2 inline-flex text-xs leading-5 font-semibold rounded-full", priorityColors[wo.priority])}>
-                                                {wo.priority}
-                                            </p>
-                                        </div>
+                <div className="grid grid-cols-1 gap-4">
+                    {filteredOrders.map((wo) => (
+                        <Link key={wo.id} to={`/work-orders/${wo.id}`} className="surface-card surface-card-hover">
+                            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                                <div>
+                                    <div className="flex flex-wrap items-center gap-2">
+                                        <h3 className="card-title">{wo.title}</h3>
+                                        <span className={clsx('chip', statusClasses[wo.status])}>{wo.status.replace('_', ' ')}</span>
                                     </div>
-                                    <div className="mt-2 sm:flex sm:justify-between">
-                                        <div className="sm:flex">
-                                            <p className="flex items-center text-sm text-gray-500 mr-6">
-                                                Asset: {wo.asset?.name || 'General'}
-                                            </p>
-                                            <p className="flex items-center text-sm text-gray-500">
-                                                Assigned: {wo.assignedTo?.name || 'Unassigned'}
-                                            </p>
-                                        </div>
-                                        <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
-                                            <p>Created on {new Date(wo.createdAt).toLocaleDateString()}</p>
-                                        </div>
+                                    <div className="mt-2 flex flex-wrap items-center gap-4 text-sm text-slate-600">
+                                        <span className="flex items-center gap-2">
+                                            <MapPin className="h-4 w-4 text-slate-400" />
+                                            {wo.asset?.name || 'General Issue'}
+                                        </span>
+                                        <span className="text-slate-500">Assigned: {wo.assignedTo?.name || 'Unassigned'}</span>
                                     </div>
-                                </Link>
-                            </li>
-                        ))}
-                        {filteredOrders.length === 0 && (
-                            <li className="px-4 py-10 text-center text-gray-500">No work orders found.</li>
-                        )}
-                    </ul>
+                                </div>
+                                <div className="flex items-center gap-4 text-sm">
+                                    <span className={clsx(priorityClasses[wo.priority])}>{wo.priority}</span>
+                                    <span className="text-slate-500">{new Date(wo.createdAt).toLocaleDateString()}</span>
+                                </div>
+                            </div>
+                        </Link>
+                    ))}
+                    {filteredOrders.length === 0 && (
+                        <div className="empty-state">No work orders found.</div>
+                    )}
                 </div>
             )}
         </div>

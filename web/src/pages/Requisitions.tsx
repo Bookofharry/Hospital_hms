@@ -63,85 +63,82 @@ export default function Requisitions() {
 
     const getStatusBadge = (status: string) => {
         const colors: Record<string, string> = {
-            PENDING: 'bg-yellow-100 text-yellow-800',
-            APPROVED: 'bg-green-100 text-green-800',
-            REJECTED: 'bg-red-100 text-red-800'
+            PENDING: 'chip-amber',
+            APPROVED: 'chip-emerald',
+            REJECTED: 'chip-rose'
         };
-        return colors[status] || 'bg-gray-100 text-gray-800';
+        return `chip ${colors[status] || 'chip-neutral'}`;
     };
 
-    if (loading) return <div className="p-6">Loading requisitions...</div>;
+    if (loading) return <div className="empty-state">Loading requisitions...</div>;
 
     return (
-        <div className="p-6">
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold text-gray-800">Requisitions</h1>
-                <button
-                    onClick={() => setShowModal(true)}
-                    className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
-                >
-                    <Plus size={20} /> New Request
+        <div className="page">
+            <div className="page-header">
+                <div>
+                    <p className="page-eyebrow">Requisitions</p>
+                    <h1 className="page-title">Requests & Approvals</h1>
+                    <p className="page-subtitle">Track purchase and repair requests with clear approvals.</p>
+                </div>
+                <button onClick={() => setShowModal(true)} className="btn-primary">
+                    <Plus size={18} /> New Request
                 </button>
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
-                <table className="w-full">
-                    <thead className="bg-gray-50 border-b">
+            <div className="surface-card">
+                <table className="table">
+                    <thead>
                         <tr>
-                            <th className="text-left p-4 font-medium text-gray-600">Title</th>
-                            <th className="text-left p-4 font-medium text-gray-600">Requester</th>
-                            <th className="text-left p-4 font-medium text-gray-600">Status</th>
-                            <th className="text-left p-4 font-medium text-gray-600">Date</th>
-                            {isAdmin && <th className="text-left p-4 font-medium text-gray-600">Actions</th>}
+                            <th>Title</th>
+                            <th>Requester</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            {isAdmin && <th>Actions</th>}
                         </tr>
                     </thead>
                     <tbody>
                         {requisitions.map((req) => (
-                            <tr key={req.id} className="border-b hover:bg-gray-50">
-                                <td className="p-4">
+                            <tr key={req.id}>
+                                <td>
                                     <div className="flex items-center gap-2">
-                                        <FileText className="text-gray-400" size={18} />
+                                        <FileText className="text-slate-400" size={18} />
                                         <div>
-                                            <div className="font-medium">{req.title}</div>
+                                            <div className="font-medium text-slate-800">{req.title}</div>
                                             {req.description && (
-                                                <div className="text-sm text-gray-500">{req.description}</div>
+                                                <div className="text-sm text-slate-500">{req.description}</div>
                                             )}
                                         </div>
                                     </div>
                                 </td>
-                                <td className="p-4 text-gray-600">{req.requester.name}</td>
-                                <td className="p-4">
-                                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadge(req.status)}`}>
-                                        {req.status}
-                                    </span>
+                                <td className="text-slate-600">{req.requester.name}</td>
+                                <td>
+                                    <span className={getStatusBadge(req.status)}>{req.status}</span>
                                 </td>
-                                <td className="p-4 text-gray-600">
+                                <td className="text-slate-600">
                                     {new Date(req.createdAt).toLocaleDateString()}
                                 </td>
                                 {isAdmin && (
-                                    <td className="p-4">
+                                    <td>
                                         {req.status === 'PENDING' && (
                                             <div className="flex gap-2">
                                                 <button
                                                     onClick={() => handleApprove(req.id)}
-                                                    className="text-green-600 hover:text-green-800"
+                                                    className="btn-secondary"
                                                     title="Approve"
                                                 >
-                                                    <Check size={18} />
+                                                    <Check size={16} />
                                                 </button>
                                                 <button
                                                     onClick={() => handleReject(req.id)}
-                                                    className="text-red-600 hover:text-red-800"
+                                                    className="btn-secondary"
                                                     title="Reject"
                                                 >
-                                                    <X size={18} />
+                                                    <X size={16} />
                                                 </button>
                                             </div>
                                         )}
                                         {req.status !== 'PENDING' && req.approver && (
-                                            <span className="text-sm text-gray-500">
-                                                by {req.approver.name}
-                                            </span>
+                                            <span className="text-sm text-slate-500">by {req.approver.name}</span>
                                         )}
                                     </td>
                                 )}
@@ -149,7 +146,7 @@ export default function Requisitions() {
                         ))}
                         {requisitions.length === 0 && (
                             <tr>
-                                <td colSpan={isAdmin ? 5 : 4} className="p-8 text-center text-gray-500">
+                                <td colSpan={isAdmin ? 5 : 4} className="text-center text-slate-500 py-8">
                                     No requisitions found
                                 </td>
                             </tr>
@@ -158,47 +155,35 @@ export default function Requisitions() {
                 </table>
             </div>
 
-            {/* Create Modal */}
             {showModal && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-xl p-6 w-full max-w-md">
-                        <h2 className="text-xl font-bold mb-4">New Requisition</h2>
-                        <form onSubmit={handleCreate} className="space-y-4">
+                <div className="modal-overlay">
+                    <div className="modal">
+                        <h2 className="text-xl font-semibold text-slate-800">New Requisition</h2>
+                        <form onSubmit={handleCreate} className="mt-4 space-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                                <label className="label">Title</label>
                                 <input
                                     type="text"
                                     required
                                     value={form.title}
                                     onChange={(e) => setForm({ ...form, title: e.target.value })}
-                                    className="w-full border rounded-lg p-2"
+                                    className="input"
                                     placeholder="e.g., Request for new AC unit"
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                                <label className="label">Description</label>
                                 <textarea
                                     value={form.description}
                                     onChange={(e) => setForm({ ...form, description: e.target.value })}
-                                    className="w-full border rounded-lg p-2"
+                                    className="input"
                                     rows={3}
                                     placeholder="Provide details..."
                                 />
                             </div>
-                            <div className="flex gap-3 pt-2">
-                                <button
-                                    type="button"
-                                    onClick={() => setShowModal(false)}
-                                    className="flex-1 border border-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-50"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
-                                >
-                                    Submit
-                                </button>
+                            <div className="flex gap-2">
+                                <button type="button" onClick={() => setShowModal(false)} className="btn-secondary flex-1">Cancel</button>
+                                <button type="submit" className="btn-primary flex-1">Submit</button>
                             </div>
                         </form>
                     </div>

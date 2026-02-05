@@ -1,4 +1,3 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
@@ -6,8 +5,10 @@ import { Toaster } from 'react-hot-toast';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import AssetList from './pages/assets/AssetList';
+import AssetForm from './pages/assets/AssetForm';
 import WorkOrderList from './pages/work-orders/WorkOrderList';
 import WorkOrderDetail from './pages/work-orders/WorkOrderDetail';
+import WorkOrderForm from './pages/work-orders/WorkOrderForm';
 import MainLayout from './components/Layout/MainLayout';
 import LandingPage from './pages/LandingPage';
 import PreventiveList from './pages/PreventiveList';
@@ -24,7 +25,7 @@ import Requisitions from './pages/Requisitions';
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, loading } = useAuth();
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div className="empty-state">Loading session...</div>;
   return isAuthenticated ? children : <Navigate to="/login" />;
 };
 
@@ -46,7 +47,10 @@ function App() {
                   <Routes>
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/assets" element={<AssetList />} />
+                    <Route path="/assets/new" element={<AssetForm />} />
+                    <Route path="/assets/:id/edit" element={<AssetForm />} />
                     <Route path="/work-orders" element={<WorkOrderList />} />
+                    <Route path="/work-orders/new" element={<WorkOrderForm />} />
                     <Route path="/work-orders/:id" element={<WorkOrderDetail />} />
 
                     {/* Placeholders for Phase 2/3 */}

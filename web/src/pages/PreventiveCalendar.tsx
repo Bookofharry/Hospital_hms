@@ -29,7 +29,7 @@ export default function PreventiveCalendar() {
             const mappedEvents = plans.map(plan => {
                 const startDate = new Date(plan.nextDue);
                 const endDate = new Date(startDate);
-                endDate.setHours(startDate.getHours() + 1); // Mock 1 hour duration
+                endDate.setHours(startDate.getHours() + 1);
 
                 return {
                     id: plan.id,
@@ -49,27 +49,36 @@ export default function PreventiveCalendar() {
     };
 
     const eventStyleGetter = (event: CalendarEvent) => {
-        let backgroundColor = '#3b82f6'; // blue-500
+        let backgroundColor = '#38bdf8';
         const now = new Date();
-        if (event.start < now) backgroundColor = '#ef4444'; // red-500 (Overdue)
+        if (event.start < now) backgroundColor = '#f97316';
 
         return {
             style: {
                 backgroundColor,
-                borderRadius: '4px',
-                opacity: 0.8,
+                borderRadius: '10px',
+                opacity: 0.9,
                 color: 'white',
                 border: '0px',
-                display: 'block'
+                display: 'block',
+                padding: '4px 8px'
             }
         };
     };
 
     return (
-        <div className="p-6 h-[85vh]">
-            <h1 className="text-2xl font-bold text-gray-800 mb-4">Maintenance Calendar</h1>
-            {loading ? <p>Loading...</p> : (
-                <div className="h-full bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+        <div className="page">
+            <div className="page-header">
+                <div>
+                    <p className="page-eyebrow">Preventive Maintenance</p>
+                    <h1 className="page-title">Maintenance Calendar</h1>
+                    <p className="page-subtitle">Visualize upcoming inspections and routine checks.</p>
+                </div>
+            </div>
+            {loading ? (
+                <div className="empty-state">Loading calendar...</div>
+            ) : (
+                <div className="surface-card h-[70vh]">
                     <Calendar
                         localizer={localizer}
                         events={events}

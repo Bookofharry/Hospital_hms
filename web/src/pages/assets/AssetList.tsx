@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Search, QrCode, Edit, Trash2 } from 'lucide-react';
-import api from '../../api/axios';
+import { Plus, Search, QrCode, Edit, ShieldCheck, MapPin } from 'lucide-react';
+import { demoStore } from '../../data/demoStore';
+import clsx from 'clsx';
 
 interface Asset {
     id: string;
@@ -9,7 +10,16 @@ interface Asset {
     model: string;
     serialNumber: string;
     location: string;
+    department?: string;
+    status?: string;
+    warrantyEndDate?: string;
 }
+
+const statusStyles: Record<string, string> = {
+    Operational: 'chip-emerald',
+    'In Service': 'chip-indigo',
+    'Under Review': 'chip-amber'
+};
 
 export default function AssetList() {
     const [assets, setAssets] = useState<Asset[]>([]);
@@ -17,98 +27,140 @@ export default function AssetList() {
     const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
-        fetchAssets();
+        const load = async () => {
+            const data = await demoStore.getAssets();
+            setAssets(data as Asset[]);
+            setLoading(false);
+        };
+        load();
     }, []);
 
-    const fetchAssets = async () => {
-        try {
-            const response = await api.get('/assets');
-            setAssets(response.data);
-        } catch (error) {
-            console.error('Failed to fetch assets', error);
-        } finally {
-            setLoading(false);
-        }
-    };
+    const filteredAssets = useMemo(() => (
+        assets.filter(asset =>
+            asset.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            asset.model?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            asset.serialNumber?.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+    ), [assets, searchTerm]);
 
-    const handleDelete = async (id: string) => {
-        if (!window.confirm('Are you sure you want to delete this asset?')) return;
-        try {
-            await api.delete(`/assets/${id}`);
-            setAssets(assets.filter(a => a.id !== id));
-        } catch (error) {
-            console.error('Failed to delete asset', error);
-        }
-    };
-
-    const filteredAssets = assets.filter(asset =>
-        asset.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        asset.model?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        asset.serialNumber?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const assetSummary = useMemo(() => {
+        const total = assets.length;
+        const needsReview = assets.filter(a => a.status === 'Under Review').length;
+        const operational = assets.filter(a => a.status === 'Operational' || a.status === 'In Service').length;
+        return { total, operational, needsReview };
+    }, [assets]);
 
     return (
-        <div>
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold text-gray-900">Assets</h1>
+        <div className="page">
+            <div className="page-header">
+                <div>
+                    <p className="page-eyebrow">Asset Registry</p>
+                    <h1 className="page-title">Assets & Equipment</h1>
+                    <p className="page-subtitle">Track mission-critical equipment across departments with warranty and service visibility.</p>
+                </div>
                 <Link
                     to="/assets/new"
-                    className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
+                    className="btn-primary"
                 >
-                    <Plus className="-ml-1 mr-2 h-5 w-5" />
+                    <Plus className="h-5 w-5" />
                     Add Asset
                 </Link>
             </div>
 
-            <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
-                <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <Search className="h-5 w-5 text-gray-400" />
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                <div className="kpi-card">
+                    <div>
+                        <p className="kpi-label">Total Assets</p>
+                        <p className="kpi-value">{assetSummary.total}</p>
                     </div>
-                    <input
-                        type="text"
-                        className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                        placeholder="Search assets..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
+                    <div className="kpi-icon kpi-icon-indigo">
+                        <ShieldCheck size={22} />
+                    </div>
+                </div>
+                <div className="kpi-card">
+                    <div>
+                        <p className="kpi-label">Operational</p>
+                        <p className="kpi-value">{assetSummary.operational}</p>
+                    </div>
+                    <div className="kpi-icon kpi-icon-emerald">
+                        <ShieldCheck size={22} />
+                    </div>
+                </div>
+                <div className="kpi-card">
+                    <div>
+                        <p className="kpi-label">Needs Review</p>
+                        <p className="kpi-value">{assetSummary.needsReview}</p>
+                    </div>
+                    <div className="kpi-icon kpi-icon-amber">
+                        <ShieldCheck size={22} />
+                    </div>
+                </div>
+            </div>
+
+            <div className="surface-card mt-6">
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                    <div>
+                        <h2 className="section-title">Equipment Overview</h2>
+                        <p className="section-subtitle">Search by name, model, or serial number.</p>
+                    </div>
+                    <div className="relative w-full md:max-w-sm">
+                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                        <input
+                            type="text"
+                            className="input input-with-icon"
+                            placeholder="Search assets..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
                 </div>
             </div>
 
             {loading ? (
-                <div className="text-center py-10">Loading assets...</div>
+                <div className="empty-state">Loading assets...</div>
             ) : (
-                <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-                    <ul className="divide-y divide-gray-200">
-                        {filteredAssets.map((asset) => (
-                            <li key={asset.id} className="hover:bg-gray-50">
-                                <div className="px-4 py-4 sm:px-6 flex items-center justify-between">
-                                    <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-medium text-blue-600 truncate">{asset.name}</p>
-                                        <div className="mt-1 flex items-center text-sm text-gray-500">
-                                            <span className="truncate mr-4">Model: {asset.model || 'N/A'}</span>
-                                            <span className="truncate mr-4">S/N: {asset.serialNumber || 'N/A'}</span>
-                                            <span className="truncate">Loc: {asset.location || 'N/A'}</span>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center space-x-4">
-                                        <Link to={`/assets/${asset.id}/qr`} className="text-gray-400 hover:text-gray-600">
-                                            <QrCode className="h-5 w-5" />
-                                        </Link>
-                                        <Link to={`/assets/${asset.id}/edit`} className="text-gray-400 hover:text-blue-600">
-                                            <Edit className="h-5 w-5" />
-                                        </Link>
-                                        <button onClick={() => handleDelete(asset.id)} className="text-gray-400 hover:text-red-600">
-                                            <Trash2 className="h-5 w-5" />
-                                        </button>
-                                    </div>
+                <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                    {filteredAssets.map((asset) => (
+                        <div key={asset.id} className="surface-card surface-card-hover">
+                            <div className="flex items-start justify-between">
+                                <div>
+                                    <h3 className="card-title">{asset.name}</h3>
+                                    <p className="card-subtitle">{asset.model}</p>
                                 </div>
-                            </li>
-                        ))}
-                        {filteredAssets.length === 0 && (
-                            <li className="px-4 py-10 text-center text-gray-500">No assets found.</li>
-                        )}
-                    </ul>
+                                <span className={clsx('chip', statusStyles[asset.status || 'Operational'])}>
+                                    {asset.status || 'Operational'}
+                                </span>
+                            </div>
+                            <div className="mt-4 grid gap-3 text-sm text-slate-600">
+                                <div className="flex items-center gap-2">
+                                    <MapPin className="h-4 w-4 text-slate-400" />
+                                    <span>{asset.location}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-slate-400">Serial</span>
+                                    <span className="font-medium text-slate-700">{asset.serialNumber}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-slate-400">Warranty</span>
+                                    <span>{asset.warrantyEndDate ? new Date(asset.warrantyEndDate).toLocaleDateString() : 'N/A'}</span>
+                                </div>
+                            </div>
+                            <div className="mt-6 flex items-center justify-between">
+                                <span className="text-xs text-slate-500">Department: {asset.department || 'General'}</span>
+                                <div className="flex items-center gap-3">
+                                    <button className="icon-button" title="QR">
+                                        <QrCode className="h-4 w-4" />
+                                    </button>
+                                    <Link to={`/assets/${asset.id}/edit`} className="icon-button" title="Edit">
+                                        <Edit className="h-4 w-4" />
+                                    </Link>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                    {filteredAssets.length === 0 && (
+                        <div className="empty-state">No assets found.</div>
+                    )}
                 </div>
             )}
         </div>

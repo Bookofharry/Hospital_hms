@@ -4,12 +4,13 @@ import Header from './Header';
 
 export default function MainLayout({ children }: { children: ReactNode }) {
     return (
-        <div className="flex h-screen bg-gray-50 overflow-hidden">
+        <div className="app-shell">
+            <div className="app-background" aria-hidden="true" />
             <Sidebar />
-            <div className="flex flex-col flex-1 overflow-hidden">
+            <div className="app-main">
                 <Header />
-                <main className="flex-1 overflow-y-auto p-6 bg-gray-50/50">
-                    <div className="max-w-7xl mx-auto w-full">
+                <main className="app-content">
+                    <div className="app-container">
                         {children}
                     </div>
                 </main>

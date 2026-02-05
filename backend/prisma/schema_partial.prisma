@@ -1,0 +1,12 @@
+
+model Attachment {
+  id        String   @id @default(uuid())
+  url       String
+  fileType  String   // 'IMAGE' | 'DOCUMENT'
+  fileName  String
+
+  workOrderId String
+  workOrder   WorkOrder @relation(fields: [workOrderId], references: [id])
+
+  createdAt DateTime @default(now())
+}

@@ -1,4 +1,4 @@
-import api from './api';
+import { demoStore } from '../data/demoStore';
 
 // Types
 export interface OxygenCylinder {
@@ -21,27 +21,38 @@ export interface UtilityReading {
 
 // Oxygen API
 export const getCylinders = async (): Promise<OxygenCylinder[]> => {
-    const response = await api.get('/oxygen');
-    return response.data;
+    return demoStore.getOxygenCylinders();
 };
 
 export const createCylinder = async (data: Partial<OxygenCylinder>) => {
-    const response = await api.post('/oxygen', data);
-    return response.data;
+    const newCylinder: OxygenCylinder = {
+        id: `ox-${Date.now()}`,
+        serialNumber: data.serialNumber || `O2-${Math.floor(Math.random() * 9000 + 1000)}`,
+        status: (data.status as OxygenCylinder['status']) || 'FULL',
+        location: data.location || 'Main Store',
+        size: data.size || 'Jumbo',
+        logs: []
+    };
+    return demoStore.addOxygenCylinder(newCylinder);
 };
 
 export const logCylinderMovement = async (id: string, action: string, location: string, status?: string) => {
-    const response = await api.patch(`/oxygen/${id}/move`, { action, location, status });
-    return response.data;
+    void action;
+    return demoStore.moveOxygenCylinder(id, location, status);
 };
 
 // Utility API
 export const getReadings = async (): Promise<UtilityReading[]> => {
-    const response = await api.get('/utilities');
-    return response.data;
+    return demoStore.getUtilityReadings();
 };
 
 export const recordReading = async (type: string, value: number, unit: string) => {
-    const response = await api.post('/utilities', { type, value, unit });
-    return response.data;
+    const newReading: UtilityReading = {
+        id: `ut-${Date.now()}`,
+        type: type as UtilityReading['type'],
+        value,
+        unit,
+        recordedAt: new Date().toISOString()
+    };
+    return demoStore.addUtilityReading(newReading);
 };

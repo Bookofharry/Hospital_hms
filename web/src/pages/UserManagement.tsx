@@ -3,7 +3,7 @@ import { getUsers, createUser, deleteUser, type User, type CreateUserDto } from 
 import { Plus, Trash2, UserCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-const ROLES = ['ADMIN', 'MANAGER', 'TECHNICIAN'] as const;
+const ROLES = ['ADMIN', 'MANAGER', 'TECHNICIAN', 'STAFF'] as const;
 
 export default function UserManagement() {
     const [users, setUsers] = useState<User[]>([]);
@@ -58,65 +58,65 @@ export default function UserManagement() {
 
     const getRoleBadge = (role: string) => {
         const colors: Record<string, string> = {
-            ADMIN: 'bg-purple-100 text-purple-800',
-            MANAGER: 'bg-blue-100 text-blue-800',
-            TECHNICIAN: 'bg-green-100 text-green-800'
+            ADMIN: 'chip chip-indigo',
+            MANAGER: 'chip chip-sky',
+            TECHNICIAN: 'chip chip-emerald',
+            STAFF: 'chip chip-neutral'
         };
-        return colors[role] || 'bg-gray-100 text-gray-800';
+        return colors[role] || 'chip chip-neutral';
     };
 
-    if (loading) return <div className="p-6">Loading users...</div>;
+    if (loading) return <div className="empty-state">Loading users...</div>;
 
     return (
-        <div className="p-6">
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold text-gray-800">User Management</h1>
-                <button
-                    onClick={() => setShowModal(true)}
-                    className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
-                >
-                    <Plus size={20} /> Add User
+        <div className="page">
+            <div className="page-header">
+                <div>
+                    <p className="page-eyebrow">Admin</p>
+                    <h1 className="page-title">User Management</h1>
+                    <p className="page-subtitle">Manage roles, departments, and access permissions.</p>
+                </div>
+                <button onClick={() => setShowModal(true)} className="btn-primary">
+                    <Plus size={18} /> Add User
                 </button>
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
-                <table className="w-full">
-                    <thead className="bg-gray-50 border-b">
+            <div className="surface-card">
+                <table className="table">
+                    <thead>
                         <tr>
-                            <th className="text-left p-4 font-medium text-gray-600">Name</th>
-                            <th className="text-left p-4 font-medium text-gray-600">Email</th>
-                            <th className="text-left p-4 font-medium text-gray-600">Role</th>
-                            <th className="text-left p-4 font-medium text-gray-600">Department</th>
-                            <th className="text-left p-4 font-medium text-gray-600">Actions</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Department</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {users.map((user) => (
-                            <tr key={user.id} className="border-b hover:bg-gray-50">
-                                <td className="p-4 flex items-center gap-3">
-                                    <UserCircle className="text-gray-400" size={32} />
-                                    <span className="font-medium">{user.name}</span>
+                            <tr key={user.id}>
+                                <td className="flex items-center gap-3">
+                                    <UserCircle className="text-slate-400" size={28} />
+                                    <span className="font-medium text-slate-800">{user.name}</span>
                                 </td>
-                                <td className="p-4 text-gray-600">{user.email}</td>
-                                <td className="p-4">
-                                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getRoleBadge(user.role)}`}>
-                                        {user.role}
-                                    </span>
+                                <td className="text-slate-600">{user.email}</td>
+                                <td>
+                                    <span className={getRoleBadge(user.role)}>{user.role}</span>
                                 </td>
-                                <td className="p-4 text-gray-600">{user.department || '-'}</td>
-                                <td className="p-4">
+                                <td className="text-slate-600">{user.department || '-'}</td>
+                                <td>
                                     <button
                                         onClick={() => handleDelete(user.id)}
-                                        className="text-red-500 hover:text-red-700"
+                                        className="btn-secondary"
                                     >
-                                        <Trash2 size={18} />
+                                        <Trash2 size={16} />
                                     </button>
                                 </td>
                             </tr>
                         ))}
                         {users.length === 0 && (
                             <tr>
-                                <td colSpan={5} className="p-8 text-center text-gray-500">
+                                <td colSpan={5} className="text-center text-slate-500 py-8">
                                     No users found
                                 </td>
                             </tr>
@@ -125,48 +125,47 @@ export default function UserManagement() {
                 </table>
             </div>
 
-            {/* Create User Modal */}
             {showModal && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-xl p-6 w-full max-w-md">
-                        <h2 className="text-xl font-bold mb-4">Add New User</h2>
-                        <form onSubmit={handleCreate} className="space-y-4">
+                <div className="modal-overlay">
+                    <div className="modal">
+                        <h2 className="text-xl font-semibold text-slate-800">Add New User</h2>
+                        <form onSubmit={handleCreate} className="mt-4 space-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                                <label className="label">Name</label>
                                 <input
                                     type="text"
                                     required
                                     value={form.name}
                                     onChange={(e) => setForm({ ...form, name: e.target.value })}
-                                    className="w-full border rounded-lg p-2"
+                                    className="input"
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                <label className="label">Email</label>
                                 <input
                                     type="email"
                                     required
                                     value={form.email}
                                     onChange={(e) => setForm({ ...form, email: e.target.value })}
-                                    className="w-full border rounded-lg p-2"
+                                    className="input"
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                                <label className="label">Password</label>
                                 <input
                                     type="password"
                                     required
                                     value={form.password}
                                     onChange={(e) => setForm({ ...form, password: e.target.value })}
-                                    className="w-full border rounded-lg p-2"
+                                    className="input"
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                                <label className="label">Role</label>
                                 <select
                                     value={form.role}
                                     onChange={(e) => setForm({ ...form, role: e.target.value as typeof form.role })}
-                                    className="w-full border rounded-lg p-2"
+                                    className="input"
                                 >
                                     {ROLES.map((r) => (
                                         <option key={r} value={r}>{r}</option>
@@ -174,29 +173,17 @@ export default function UserManagement() {
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Department</label>
+                                <label className="label">Department</label>
                                 <input
                                     type="text"
                                     value={form.department}
                                     onChange={(e) => setForm({ ...form, department: e.target.value })}
-                                    className="w-full border rounded-lg p-2"
-                                    placeholder="Optional"
+                                    className="input"
                                 />
                             </div>
-                            <div className="flex gap-3 pt-2">
-                                <button
-                                    type="button"
-                                    onClick={() => setShowModal(false)}
-                                    className="flex-1 border border-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-50"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
-                                >
-                                    Create User
-                                </button>
+                            <div className="flex gap-2">
+                                <button type="button" onClick={() => setShowModal(false)} className="btn-secondary flex-1">Cancel</button>
+                                <button type="submit" className="btn-primary flex-1">Create User</button>
                             </div>
                         </form>
                     </div>

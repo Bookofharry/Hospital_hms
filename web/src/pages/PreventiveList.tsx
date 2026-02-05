@@ -8,7 +8,6 @@ export default function PreventiveList() {
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
 
-    // Form State
     const [formData, setFormData] = useState<{
         name: string;
         frequency: 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'YEARLY';
@@ -17,8 +16,8 @@ export default function PreventiveList() {
     }>({
         name: '',
         frequency: 'WEEKLY',
-        assetId: '', // Ideally a select dropdown
-        assignedToId: '' // Ideally a select dropdown
+        assetId: '',
+        assignedToId: ''
     });
 
     useEffect(() => {
@@ -49,37 +48,39 @@ export default function PreventiveList() {
     };
 
     return (
-        <div className="p-6">
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold text-gray-800">Preventive Maintenance</h1>
+        <div className="page">
+            <div className="page-header">
+                <div>
+                    <p className="page-eyebrow">Preventive Maintenance</p>
+                    <h1 className="page-title">Scheduled Plans</h1>
+                    <p className="page-subtitle">Stay ahead of compliance with recurring inspections and task templates.</p>
+                </div>
                 <button
                     onClick={() => setShowModal(true)}
-                    className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                    className="btn-primary"
                 >
-                    <Plus size={20} />
+                    <Plus size={18} />
                     New Plan
                 </button>
             </div>
 
             {loading ? (
-                <p>Loading...</p>
+                <div className="empty-state">Loading plans...</div>
             ) : (
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {plans.map(plan => (
-                        <div key={plan.id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                        <div key={plan.id} className="surface-card surface-card-hover">
                             <div className="flex justify-between items-start mb-2">
-                                <h3 className="font-semibold text-lg">{plan.name}</h3>
-                                <span className="text-xs font-bold px-2 py-1 bg-blue-100 text-blue-700 rounded-full">
-                                    {plan.frequency}
-                                </span>
+                                <h3 className="card-title">{plan.name}</h3>
+                                <span className="chip chip-sky">{plan.frequency}</span>
                             </div>
-                            <p className="text-sm text-gray-500 mb-4">{plan.description || 'No description'}</p>
+                            <p className="text-sm text-slate-500 mb-4">{plan.description || 'No description'}</p>
 
-                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                            <div className="flex items-center gap-2 text-sm text-slate-600">
                                 <Settings size={16} />
                                 <span>{plan.asset?.name || 'No Asset'}</span>
                             </div>
-                            <div className="flex items-center gap-2 text-sm text-gray-600 mt-1">
+                            <div className="flex items-center gap-2 text-sm text-slate-600 mt-1">
                                 <Calendar size={16} />
                                 <span>Next Due: {new Date(plan.nextDue).toLocaleDateString()}</span>
                             </div>
@@ -88,26 +89,25 @@ export default function PreventiveList() {
                 </div>
             )}
 
-            {/* Simple Modal for MVP */}
             {showModal && (
-                <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
-                    <div className="bg-white p-6 rounded-lg w-full max-w-md">
-                        <h2 className="text-xl font-bold mb-4">Create Preventive Plan</h2>
-                        <form onSubmit={handleCreate}>
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium mb-1">Plan Name</label>
+                <div className="modal-overlay">
+                    <div className="modal">
+                        <h2 className="text-xl font-semibold text-slate-800">Create Preventive Plan</h2>
+                        <form onSubmit={handleCreate} className="mt-4 space-y-4">
+                            <div>
+                                <label className="label">Plan Name</label>
                                 <input
                                     type="text"
                                     required
-                                    className="w-full border p-2 rounded"
+                                    className="input"
                                     value={formData.name}
                                     onChange={e => setFormData({ ...formData, name: e.target.value })}
                                 />
                             </div>
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium mb-1">Frequency</label>
+                            <div>
+                                <label className="label">Frequency</label>
                                 <select
-                                    className="w-full border p-2 rounded"
+                                    className="input"
                                     value={formData.frequency}
                                     onChange={e => setFormData({ ...formData, frequency: e.target.value as any })}
                                 >
@@ -117,17 +117,17 @@ export default function PreventiveList() {
                                     <option value="YEARLY">Yearly</option>
                                 </select>
                             </div>
-                            <div className="flex justify-end gap-2">
+                            <div className="flex gap-2">
                                 <button
                                     type="button"
                                     onClick={() => setShowModal(false)}
-                                    className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded"
+                                    className="btn-secondary flex-1"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
-                                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                                    className="btn-primary flex-1"
                                 >
                                     Create
                                 </button>

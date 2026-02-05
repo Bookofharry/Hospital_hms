@@ -1,4 +1,4 @@
-import api from './api';
+import { demoStore } from '../data/demoStore';
 
 export interface DashboardStats {
     totalAssets: number;
@@ -21,21 +21,17 @@ export interface UtilityReading {
 }
 
 export const getDashboardStats = async (): Promise<DashboardStats> => {
-    const response = await api.get('/reports/stats');
-    return response.data;
+    return demoStore.getDashboardStats();
 };
 
 export const getWorkOrderStats = async (): Promise<ChartData[]> => {
-    const response = await api.get('/reports/work-orders');
-    return response.data;
+    return demoStore.getWorkOrderStats();
 };
 
 export const getAssetHealth = async (): Promise<ChartData[]> => {
-    const response = await api.get('/reports/assets');
-    return response.data;
+    return demoStore.getAssetHealth();
 };
 
 export const getUtilityTrends = async (): Promise<UtilityReading[]> => {
-    const response = await api.get('/reports/utilities');
-    return response.data;
+    return demoStore.getUtilityTrends();
 };

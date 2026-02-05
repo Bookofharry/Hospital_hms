@@ -1,4 +1,4 @@
-import api from './api';
+import { demoStore } from '../data/demoStore';
 
 export interface Requisition {
     id: string;
@@ -13,21 +13,28 @@ export interface Requisition {
 }
 
 export const getRequisitions = async (): Promise<Requisition[]> => {
-    const response = await api.get('/requisitions');
-    return response.data;
+    return demoStore.getRequisitions();
 };
 
 export const createRequisition = async (data: { title: string; description?: string }): Promise<Requisition> => {
-    const response = await api.post('/requisitions', data);
-    return response.data;
+    const newReq: Requisition = {
+        id: `req-${Date.now()}`,
+        title: data.title,
+        description: data.description,
+        status: 'PENDING',
+        requesterId: 'u-005',
+        requester: { name: 'Grace Njeri', email: 'grace.njeri@hmms.demo' },
+        createdAt: new Date().toISOString()
+    };
+    return demoStore.addRequisition(newReq);
 };
 
 export const approveRequisition = async (id: string): Promise<Requisition> => {
-    const response = await api.patch(`/requisitions/${id}/approve`);
-    return response.data;
+    const updated = await demoStore.approveRequisition(id);
+    return updated as Requisition;
 };
 
 export const rejectRequisition = async (id: string): Promise<Requisition> => {
-    const response = await api.patch(`/requisitions/${id}/reject`);
-    return response.data;
+    const updated = await demoStore.rejectRequisition(id);
+    return updated as Requisition;
 };
