@@ -7,7 +7,7 @@ export interface OxygenCylinder {
     status: 'FULL' | 'EMPTY' | 'IN_USE';
     location: string;
     size: string;
-    logs: any[];
+    logs: unknown[];
 }
 
 export interface UtilityReading {

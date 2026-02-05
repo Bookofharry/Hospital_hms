@@ -54,7 +54,10 @@ type SupplierDemo = {
     address?: string;
 };
 
-type PreventiveDemo = (typeof demoPreventivePlans)[number];
+type PreventiveDemo = Omit<(typeof demoPreventivePlans)[number], 'asset' | 'assignedTo'> & {
+    asset?: { name: string };
+    assignedTo?: { name: string };
+};
 
 type OxygenDemo = {
     id: string;
@@ -62,7 +65,7 @@ type OxygenDemo = {
     status: 'FULL' | 'IN_USE' | 'EMPTY';
     location: string;
     size: string;
-    logs: any[];
+    logs: unknown[];
 };
 
 type UtilityDemo = {

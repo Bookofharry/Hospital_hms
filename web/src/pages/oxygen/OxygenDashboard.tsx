@@ -9,10 +9,6 @@ export default function OxygenDashboard() {
     const [showModal, setShowModal] = useState(false);
     const [formData, setFormData] = useState({ serialNumber: '', size: 'Jumbo', location: 'Main Store' });
 
-    useEffect(() => {
-        loadData();
-    }, []);
-
     const loadData = async () => {
         try {
             const data = await getCylinders();
@@ -22,10 +18,14 @@ export default function OxygenDashboard() {
                 empty: data.filter(c => c.status === 'EMPTY').length,
                 inUse: data.filter(c => c.status === 'IN_USE').length
             });
-        } catch (error) {
+        } catch {
             toast.error('Failed to load cylinders');
         }
     };
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        loadData();
+    }, []);
 
     const handleCreate = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -35,7 +35,7 @@ export default function OxygenDashboard() {
             setShowModal(false);
             loadData();
             setFormData({ serialNumber: '', size: 'Jumbo', location: 'Main Store' });
-        } catch (error) {
+        } catch {
             toast.error('Failed to create cylinder');
         }
     };
@@ -45,7 +45,7 @@ export default function OxygenDashboard() {
             await logCylinderMovement(id, action, newLocation, newStatus);
             toast.success('Movement Logged');
             loadData();
-        } catch (error) {
+        } catch {
             toast.error('Failed to log movement');
         }
     };

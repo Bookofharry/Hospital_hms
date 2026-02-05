@@ -2,6 +2,18 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { demoStore } from '../../data/demoStore';
 
+type AssetData = {
+    id: string;
+    name: string;
+    model?: string;
+    serialNumber?: string;
+    location?: string;
+    department?: string;
+    status?: string;
+    warrantyEndDate?: string;
+    purchaseDate?: string;
+};
+
 export default function AssetForm() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
@@ -19,8 +31,8 @@ export default function AssetForm() {
     useEffect(() => {
         const fetchAsset = async () => {
             if (!id) return;
-            const assets = await demoStore.getAssets();
-            const asset = (assets as any[]).find((a) => a.id === id);
+            const assets = (await demoStore.getAssets()) as AssetData[];
+            const asset = assets.find((a) => a.id === id);
             if (!asset) return;
             setFormData({
                 name: asset.name,
@@ -36,15 +48,17 @@ export default function AssetForm() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        await demoStore.addAsset({
+        const newAsset: AssetData = {
             id: id || `a-${Date.now()}`,
             name: formData.name,
             model: formData.model,
             serialNumber: formData.serialNumber,
             location: formData.location,
             warrantyEndDate: formData.warrantyExpiry,
-            department: 'Facilities'
-        } as any);
+            department: 'Facilities',
+            status: 'Operational'
+        };
+        await demoStore.addAsset(newAsset);
         navigate('/assets');
     };
 

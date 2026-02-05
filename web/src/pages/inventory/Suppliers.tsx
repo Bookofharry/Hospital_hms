@@ -17,7 +17,7 @@ export default function Suppliers() {
         try {
             const data = await getSuppliers();
             setSuppliers(data);
-        } catch (error) {
+        } catch {
             toast.error('Failed to load suppliers');
         } finally {
             setLoading(false);
@@ -32,7 +32,7 @@ export default function Suppliers() {
             setShowModal(false);
             loadSuppliers();
             setFormData({ name: '', email: '', phone: '', address: '' });
-        } catch (error) {
+        } catch {
             toast.error('Failed to create supplier');
         }
     };

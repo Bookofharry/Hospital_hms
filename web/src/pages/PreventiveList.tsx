@@ -28,7 +28,7 @@ export default function PreventiveList() {
         try {
             const data = await getPreventivePlans();
             setPlans(data);
-        } catch (error) {
+        } catch {
             toast.error('Failed to load plans');
         } finally {
             setLoading(false);
@@ -42,7 +42,7 @@ export default function PreventiveList() {
             toast.success('Plan Created');
             setShowModal(false);
             loadPlans();
-        } catch (error) {
+        } catch {
             toast.error('Failed to create plan');
         }
     };
@@ -109,7 +109,7 @@ export default function PreventiveList() {
                                 <select
                                     className="input"
                                     value={formData.frequency}
-                                    onChange={e => setFormData({ ...formData, frequency: e.target.value as any })}
+                                    onChange={e => setFormData({ ...formData, frequency: e.target.value as typeof formData.frequency })}
                                 >
                                     <option value="DAILY">Daily</option>
                                     <option value="WEEKLY">Weekly</option>

@@ -30,5 +30,5 @@ export const createPreventivePlan = async (data: Partial<PreventivePlan>) => {
         asset: data.asset,
         assignedTo: data.assignedTo
     };
-    return demoStore.addPreventivePlan(newPlan as any);
+    return demoStore.addPreventivePlan(newPlan);
 };

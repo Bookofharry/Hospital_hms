@@ -1,4 +1,5 @@
-import React, { createContext, useEffect, useContext, type ReactNode } from 'react';
+/* eslint-disable react-refresh/only-export-components */
+import { createContext, useEffect, useContext, useState, type ReactNode } from 'react';
 import { io, Socket } from 'socket.io-client';
 import toast from 'react-hot-toast';
 import { useAuth } from './AuthContext';
@@ -16,35 +17,32 @@ export const useNotification = () => useContext(NotificationContext);
 
 export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     const { user } = useAuth();
-    const socketRef = React.useRef<Socket | null>(null);
+    const [socket, setSocket] = useState<Socket | null>(null);
 
     useEffect(() => {
         if (user && ENABLE_SOCKET) {
-            // Connect to socket
-            socketRef.current = io(SOCKET_URL);
+            const socketInstance = io(SOCKET_URL);
+            // eslint-disable-next-line react-hooks/set-state-in-effect
+            setSocket(socketInstance);
 
-            // Join user room
-            socketRef.current.emit('join_room', user.id);
+            socketInstance.emit('join_room', user.id);
 
-            // Listen for notifications
-            socketRef.current.on('notification', (payload: { message: string, type: string }) => {
+            socketInstance.on('notification', (payload: { message: string; type: string }) => {
                 toast(payload.message, {
                     icon: payload.type === 'NEW_ASSIGNMENT' ? '🔔' : '✅',
                     duration: 5000,
                     position: 'top-right',
                 });
-
-                // Play a simple sound if browser allows (optional, skipping for now)
             });
 
             return () => {
-                socketRef.current?.disconnect();
+                socketInstance.disconnect();
             };
         }
     }, [user]);
 
     return (
-        <NotificationContext.Provider value={{ socket: socketRef.current }}>
+        <NotificationContext.Provider value={{ socket }}>
             {children}
         </NotificationContext.Provider>
     );

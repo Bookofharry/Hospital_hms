@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, User, Box, Paperclip, Upload, Clock, Plus, CheckCircle, Play, ShieldCheck, MapPin } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -56,16 +56,17 @@ export default function WorkOrderDetail() {
     const [logDescription, setLogDescription] = useState('');
     const [loggingTime, setLoggingTime] = useState(false);
 
-    const fetchWO = async () => {
+    const fetchWO = useCallback(async () => {
         if (!id) return;
         const data = await demoStore.getWorkOrder(id);
         setWo(data as WorkOrder);
         setLoading(false);
-    };
+    }, [id]);
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchWO();
-    }, [id]);
+    }, [id, fetchWO]);
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0] && id) {

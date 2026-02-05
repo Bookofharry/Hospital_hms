@@ -30,7 +30,7 @@ export const createUser = async (data: CreateUserDto): Promise<User> => {
         department: data.department,
         createdAt: new Date().toISOString()
     };
-    return demoStore.addUser(newUser);
+    return demoStore.addUser({ ...newUser, status: 'Active' });
 };
 
 export const updateUser = async (id: string, data: Partial<CreateUserDto>): Promise<User> => {

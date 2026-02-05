@@ -21,7 +21,7 @@ export default function UserForm() {
             // Fetch user data if edit mode
             // Skipping for MVP implementation speed, assuming Add User focus
         }
-    }, [id]);
+    }, [isEdit]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

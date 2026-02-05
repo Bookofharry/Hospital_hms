@@ -7,18 +7,18 @@ export default function UtilityTracker() {
     const [readings, setReadings] = useState<UtilityReading[]>([]);
     const [formData, setFormData] = useState({ type: 'ELECTRICITY', value: '', unit: 'kWh' });
 
-    useEffect(() => {
-        loadData();
-    }, []);
-
     const loadData = async () => {
         try {
             const data = await getReadings();
             setReadings(data);
-        } catch (error) {
+        } catch {
             toast.error('Failed to load readings');
         }
     };
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        loadData();
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -27,7 +27,7 @@ export default function UtilityTracker() {
             toast.success('Reading Recorded');
             setFormData({ ...formData, value: '' });
             loadData();
-        } catch (error) {
+        } catch {
             toast.error('Failed to record reading');
         }
     };

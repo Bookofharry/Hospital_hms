@@ -17,7 +17,7 @@ export default function InventoryList() {
         try {
             const data = await getInventoryItems();
             setItems(data);
-        } catch (error) {
+        } catch {
             toast.error('Failed to load inventory');
         } finally {
             setLoading(false);
@@ -32,7 +32,7 @@ export default function InventoryList() {
             toast.success('Stock updated');
             setAdjustItem(null);
             loadItems();
-        } catch (error) {
+        } catch {
             toast.error('Failed to update stock');
         }
     };

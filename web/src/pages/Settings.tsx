@@ -14,10 +14,19 @@ export default function Settings() {
 
     useEffect(() => {
         if (user) {
+            const departmentValue = (() => {
+                const raw = (user as { department?: unknown }).department;
+                if (typeof raw === 'string') return raw;
+                if (raw && typeof raw === 'object' && 'name' in raw && typeof (raw as { name?: unknown }).name === 'string') {
+                    return (raw as { name: string }).name;
+                }
+                return '';
+            })();
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setForm({
                 name: user.name || '',
                 email: user.email || '',
-                department: (user as any).department || ''
+                department: departmentValue
             });
         }
     }, [user]);

@@ -1,20 +1,27 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { QRCodeCanvas } from 'qrcode.react';
-import api from '../../api/axios';
 import { Printer, ArrowLeft } from 'lucide-react';
+import { demoStore } from '../../data/demoStore';
+
+type AssetQR = {
+    id: string;
+    name: string;
+    serialNumber?: string;
+};
 
 export default function AssetQRCallback() {
     const { id } = useParams<{ id: string }>();
-    const [asset, setAsset] = useState<any>(null);
+    const [asset, setAsset] = useState<AssetQR | null>(null);
 
     useEffect(() => {
         const fetchAsset = async () => {
             try {
-                const response = await api.get(`/assets/${id}`);
-                setAsset(response.data);
-            } catch (error) {
-                console.error('Error fetching asset', error);
+                const assets = (await demoStore.getAssets()) as AssetQR[];
+                const found = assets.find((item) => item.id === id) || null;
+                setAsset(found);
+            } catch {
+                setAsset(null);
             }
         };
         fetchAsset();
@@ -24,7 +31,7 @@ export default function AssetQRCallback() {
         window.print();
     };
 
-    if (!asset) return <div>Loading...</div>;
+    if (!asset) return <div className="empty-state">Loading...</div>;
 
     // The QR payload could be a URL scheme or just the ID
     const qrPayload = JSON.stringify({
