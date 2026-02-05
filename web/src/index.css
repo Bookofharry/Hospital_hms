@@ -357,6 +357,10 @@
     @apply inline-flex items-center justify-center gap-2 rounded-full bg-sky-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-sky-700;
   }
 
+  .landing-actions .nav-btn {
+    @apply bg-sky-600 text-white;
+  }
+
   .landing-actions {
     @apply flex items-center gap-3;
   }
