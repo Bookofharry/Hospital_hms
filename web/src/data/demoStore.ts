@@ -13,7 +13,13 @@ import {
     demoAssetHealth
 } from './demo';
 
-type AssetDemo = (typeof demoAssets)[number] & {
+type AssetDemo = Omit<(typeof demoAssets)[number], 'model' | 'serialNumber' | 'location' | 'department' | 'status' | 'warrantyEndDate'> & {
+    model?: string;
+    serialNumber?: string;
+    location?: string;
+    department?: string;
+    status?: string;
+    warrantyEndDate?: string;
     purchaseDate?: string;
 };
 
@@ -31,7 +37,8 @@ type WorkOrderDemo = {
     timeLogs?: { id: string; minutes: number; description: string; user: { name: string }; createdAt: string }[];
 };
 
-type UserDemo = (typeof demoUsers)[number] & {
+type UserDemo = Omit<(typeof demoUsers)[number], 'department'> & {
+    department?: string;
     status?: string;
 };
 
@@ -54,7 +61,8 @@ type SupplierDemo = {
     address?: string;
 };
 
-type PreventiveDemo = Omit<(typeof demoPreventivePlans)[number], 'asset' | 'assignedTo'> & {
+type PreventiveDemo = Omit<(typeof demoPreventivePlans)[number], 'asset' | 'assignedTo' | 'description'> & {
+    description?: string;
     asset?: { name: string };
     assignedTo?: { name: string };
 };
