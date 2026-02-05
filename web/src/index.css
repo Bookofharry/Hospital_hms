@@ -368,12 +368,13 @@
   }
 
   .landing-actions .nav-btn {
-    @apply bg-sky-600 text-white;
+    background-color: #0284c7 !important;
+    color: #fff !important;
   }
 
   .nav-btn-blue {
-    background-color: #0284c7;
-    color: #fff;
+    background-color: #0284c7 !important;
+    color: #fff !important;
   }
 
   .landing-actions {
