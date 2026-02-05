@@ -19,26 +19,27 @@ export default function Login() {
         try {
             await new Promise(resolve => setTimeout(resolve, 800));
 
-            let role = 'ADMIN';
-            let name = 'Demo Admin';
-            const lowerEmail = email.toLowerCase();
+            const allowed = {
+                'admin@hospital.com': { role: 'ADMIN', name: 'Demo Admin' },
+                'manager@hospital.com': { role: 'MANAGER', name: 'Facility Manager' },
+                'tech@hospital.com': { role: 'TECHNICIAN', name: 'John Technician' },
+                'staff@hospital.com': { role: 'STAFF', name: 'Sarah Staff' }
+            } as const;
 
-            if (lowerEmail.includes('manager')) {
-                role = 'MANAGER';
-                name = 'Facility Manager';
-            } else if (lowerEmail.includes('tech')) {
-                role = 'TECHNICIAN';
-                name = 'John Technician';
-            } else if (lowerEmail.includes('staff')) {
-                role = 'STAFF';
-                name = 'Sarah Staff';
+            const normalizedEmail = email.trim().toLowerCase();
+            const allowedUser = allowed[normalizedEmail as keyof typeof allowed];
+
+            if (!allowedUser) {
+                setError('Use an approved demo login: admin@hospital.com, manager@hospital.com, tech@hospital.com, or staff@hospital.com.');
+                setIsLoading(false);
+                return;
             }
 
             const mockUser = {
                 id: '1',
-                name: name,
-                email: email || 'demo@hmms.demo',
-                role: role,
+                name: allowedUser.name,
+                email: normalizedEmail,
+                role: allowedUser.role,
                 department: { name: 'Facilities' }
             };
 

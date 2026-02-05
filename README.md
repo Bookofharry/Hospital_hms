@@ -37,3 +37,12 @@ cd backend && npm install
 cd ../web && npm install
 cd ../mobile && npm install
 ```
+
+## Web Demo Logins
+
+Only these demo accounts can log in to the web app:
+
+- `admin@hospital.com` → ADMIN
+- `manager@hospital.com` → MANAGER
+- `tech@hospital.com` → TECHNICIAN
+- `staff@hospital.com` → STAFF
