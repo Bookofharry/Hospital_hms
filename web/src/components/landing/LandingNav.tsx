@@ -6,13 +6,13 @@ export default function LandingNav() {
     <nav className="landing-nav">
       <div className="landing-brand">
         <div className="brand-mark">
-          <Activity className="h-5 w-5" />
+          <Activity className="h-5 w-5 brand-icon-glow" />
         </div>
-        <span className="brand-title">HMMS</span>
+        <span className="brand-title brand-title-glow">HMMS</span>
       </div>
       <div className="landing-actions">
-        <Link to="/login" className="nav-btn">Sign In</Link>
-        <Link to="/login" className="nav-btn">Request Demo</Link>
+        <Link to="/login" className="nav-btn nav-btn-blue">Sign In</Link>
+        <Link to="/login" className="nav-btn nav-btn-blue">Request Demo</Link>
       </div>
     </nav>
   );

@@ -79,6 +79,16 @@
     @apply text-lg font-semibold tracking-tight;
   }
 
+  .brand-title-glow {
+    color: #0ea5e9;
+    text-shadow: 0 0 8px rgba(14, 165, 233, 0.6), 0 0 16px rgba(14, 165, 233, 0.35);
+  }
+
+  .brand-icon-glow {
+    color: #0ea5e9;
+    filter: drop-shadow(0 0 6px rgba(14, 165, 233, 0.6));
+  }
+
   .brand-subtitle {
     @apply text-xs uppercase tracking-[0.2em] text-slate-400;
   }
@@ -359,6 +369,11 @@
 
   .landing-actions .nav-btn {
     @apply bg-sky-600 text-white;
+  }
+
+  .nav-btn-blue {
+    background-color: #0284c7;
+    color: #fff;
   }
 
   .landing-actions {
